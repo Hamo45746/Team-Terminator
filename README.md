@@ -1,4 +1,4 @@
-# METR4202-Team-12
+# Team Terminator
 
 Welcome to the robozone :o<br />
 
