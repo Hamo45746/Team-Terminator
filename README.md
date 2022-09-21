@@ -8,4 +8,5 @@ Notes: (updated 0954 12/09)<br />
   joint 4 limit is +- 1.8<br />
   
   
-aruco detect package then change topic in the config
+"aruco detect" package <br />
+- then change topic in the config
