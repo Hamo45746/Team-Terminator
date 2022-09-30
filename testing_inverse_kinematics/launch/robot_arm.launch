@@ -1,0 +1,13 @@
+<launch>
+    <node name="dynamixel_interface_controller_node" pkg="dynamixel_interface" type="dynamixel_interface_controller_node" output="screen">
+		<rosparam command="load" file="$(find dynamixel_interface)/config/controller_config.yaml" />
+	</node>
+    <node name="new_Motor_angle_publisher" pkg="testing_inverse_kinematics" type="new_Motor_angle_publisher.py" />
+    <node name="gripper_publisher" pkg="testing_inverse_kinematics" type="gripper_publisher.py" />
+    <node name="end_pos_check" pkg="testing_inverse_kinematics" type="end_pos_check.py" />
+    <node name="joint_publisher_converter" pkg="testing_inverse_kinematics" type="joint_publisher_converter.py" />
+
+</launch>
+
+
+
