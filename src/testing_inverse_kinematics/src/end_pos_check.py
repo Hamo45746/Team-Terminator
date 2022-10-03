@@ -14,7 +14,7 @@ from std_msgs.msg import Header
 import numpy as np
 import math as m
 
-print('checker running')
+print('end pos checker running')
 
 L1 = 0.055
 L2 = 0.118
@@ -28,7 +28,6 @@ joint_state = [1000,1000,1000,1000]
 
 def store_grab(pose: JointState):
     global grab_state
-    print("in store grab")
     grab_state= pose
     
 
@@ -39,7 +38,6 @@ def store_intermediate(pose: JointState):
 def store_drop(pose: JointState):
     global drop_state
     drop_state= pose    
-
 
 
 
@@ -60,19 +58,21 @@ def store_state(i):
 
 def verify(joint_state: JointState): # passes in the desired state
     print("verify")
-    global grab_state, int_state,drop_state, state,been_1q_g,been_1q_i,been_1q_d
+    global grab_state, int_state,drop_state, state,been_1q_g,been_1q_i,been_1q_d,pub_close
     if state==2:
+        been_1q_d=0
+        been_1q_i = 0
         current_theta4 = joint_state.position[0]
         current_theta3 = joint_state.position[1]
         current_theta2 = joint_state.position[2]
         current_theta1 = joint_state.position[3]
 
         desired_theta1 = grab_state.position[0]
-        desired_theta2 = grab_state.position[1]
+        desired_theta2 = grab_state.position[1] 
         desired_theta3 = grab_state.position[2]
         desired_theta4 = grab_state.position[3]
 
-        close_factor_low = 1
+        close_factor_low = 0.98
         close_factor_high = 1.1
 
         print('current 1, desired 1:',current_theta1,desired_theta1)
@@ -96,8 +96,8 @@ def verify(joint_state: JointState): # passes in the desired state
             average = (theta2_close_factor + theta3_close_factor + theta4_close_factor) / (3)
             print('state 2 0:',average)
         
-        if (close_factor_low<= average <= close_factor_high) and (been_1q_g==0):
-            print('close')
+        if (close_factor_low<= average <= close_factor_high) and (been_1q_g==0) and (close_factor_low*0.8<= theta2_close_factor <= close_factor_high):
+            pub_close.publish(1)
             if state == 2:
                 pub_state.publish(3)
                 state = 3
@@ -149,13 +149,17 @@ def verify(joint_state: JointState): # passes in the desired state
                     print('hi')
                     j=1
                 #'''
-    elif state == 4:
+       
+
+    elif (state==4) or (state==1):
+        print("been 1 state 4or1:",been_1q_i)
+        been_1q_g=0
         current_theta4 = joint_state.position[0]
         current_theta3 = joint_state.position[1]
         current_theta2 = joint_state.position[2]
         current_theta1 = joint_state.position[3]
 
-        '''
+        ''' 
         desired_theta1 = int_state.position[0]
         desired_theta2 = int_state.position[1]
         desired_theta3 = int_state.position[2]
@@ -167,25 +171,31 @@ def verify(joint_state: JointState): # passes in the desired state
         desired_theta4 = 0.1
 
 
-        close_factor_low = 0.99
+        close_factor_low = 0.9
         close_factor_high = 1.1
 
         if desired_theta1 != float(0):
             theta1_close_factor = np.abs(current_theta1 / desired_theta1)
+            print('\n\n1:',theta1_close_factor)
             theta2_close_factor = np.abs(current_theta2 / desired_theta2)
-            theta3close_factor = np.abs(current_theta3 / desired_theta3)
+            print('2:',theta2_close_factor)
+            theta3_close_factor = np.abs(current_theta3 / desired_theta3)
+            print('3:',theta3_close_factor)
             theta4_close_factor = np.abs(current_theta4 / desired_theta4)
+            print('4:',theta4_close_factor)
 
-            average = (theta1_close_factor + theta2_close_factor + theta3close_factor + theta4_close_factor) / (4)
+            average = (theta1_close_factor + theta2_close_factor + theta3_close_factor + theta4_close_factor) / (4)
             print(average)
         else:
             theta2_close_factor = np.abs(current_theta2 / desired_theta2)
-            theta3close_factor = np.abs(current_theta3 / desired_theta3)
+            theta3_close_factor = np.abs(current_theta3 / desired_theta3)
             theta4_close_factor = np.abs(current_theta4 / desired_theta4)
-            average = (theta2_close_factor + theta3close_factor + theta4_close_factor) / (3)
+            average = (theta2_close_factor + theta3_close_factor + theta4_close_factor) / (3)
             print('state 4 aaverga:', average)
         
         if (close_factor_low<= average <= close_factor_high) and (desired_theta2*0.8 <= current_theta2 <= desired_theta2*1.2) and (been_1q_i==0):
+            pub_close.publish(1)
+
             print('close')
             if state == 2:
                 pub_state.publish(3)
@@ -197,8 +207,10 @@ def verify(joint_state: JointState): # passes in the desired state
                 pub_state.publish(6)
                 state = 6
             been_1q_i=1
-    elif state==5:
         
+
+    elif state==5:
+
         current_theta4 = joint_state.position[0]
         current_theta3 = joint_state.position[1]
         current_theta2 = joint_state.position[2]
@@ -228,8 +240,7 @@ def verify(joint_state: JointState): # passes in the desired state
             average = (theta2_close_factor + theta3_close_factor + theta4_close_factor) / (3)
         
         if (average > close_factor_low) and (average < close_factor_high) and (desired_theta1*0.8 <= current_theta1 <= desired_theta1*1.2) and (been_1q_d==0):
-            print('close')
-            
+            pub_close.publish(1)
             if state == 2:
                 pub_state.publish(3)
                 state = 3
@@ -240,10 +251,12 @@ def verify(joint_state: JointState): # passes in the desired state
                 pub_state.publish(6)
                 state = 6
             been_1q_d=1
+            been_1q_i = 0
             print(current_theta1,desired_theta1)
             print(current_theta2,desired_theta2)
             print(current_theta3,desired_theta3)
             print(current_theta4,desired_theta4)
+      
 
 
 '''
@@ -390,12 +403,19 @@ def verify_drop(joint_state: JointState): # passes in the desired state
 #'''
 
 def main():
-    global pub_state
+    global pub_state,pub_close
     #pub_joint
     
+    print('here')
     # Create publisher
     pub_state = rospy.Publisher(
         'state', # Topic name
+        msg.Int16, # Message type
+        queue_size=10 # Topic size (optional)
+    )
+
+    pub_close = rospy.Publisher(
+        'end_pos_check', # Topic name
         msg.Int16, # Message type
         queue_size=10 # Topic size (optional)
     )

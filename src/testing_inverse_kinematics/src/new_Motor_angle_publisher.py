@@ -20,7 +20,6 @@ print('motor publisher running')
 # tf2 quat to euler
 colour = 'test'
 
-state = 2
 
 def store_colour(i):
     global colour
@@ -42,12 +41,12 @@ def inverse_kinematics(pose: Pose) -> JointState:
     L4 = 0.1
     robot_origin = [0 , 0 , 0]
     
-    if state == 4: # intermediate state
+    if (state == 4) or (state==1): # intermediate state
         print('here')
         theta2 = 0.71
         theta3 = -2.2
         theta4 = 0.1
-        theta1 = 0.00001
+        theta1 = 0
 
         msg = JointState(
                 # Set header with current time
