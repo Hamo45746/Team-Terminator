@@ -20,7 +20,6 @@ print('motor publisher running')
 # tf2 quat to euler
 colour = 'test'
 
-state = 2
 
 def store_colour(i):
     global colour
@@ -32,9 +31,7 @@ def store_state(i):
     state = i.data
 
 def inverse_kinematics(pose: Pose) -> JointState:
-    global pub_joint
-    global colour
-    global state
+    global pub_joint,colour,state
     print('received')
     L1 = 0.055
     L2 = 0.118
@@ -42,12 +39,12 @@ def inverse_kinematics(pose: Pose) -> JointState:
     L4 = 0.1
     robot_origin = [0 , 0 , 0]
     
-    if state == 4: # intermediate state
-        print('here')
+    if (state == 4) or (state==1): # intermediate state
+        print('IN PUBLISHER STATE 1')
         theta2 = 0.71
         theta3 = -2.2
         theta4 = 0.1
-        theta1 = 0.00001
+        theta1 = 0
 
         msg = JointState(
                 # Set header with current time
@@ -66,15 +63,15 @@ def inverse_kinematics(pose: Pose) -> JointState:
         pub_intermediate_state.publish(msg)
 
     elif state == 5:
-        colour = 'red'
-        if colour == 'blue':
+        #colour = 'R'
+        if colour == "B":
             theta1 = -2.6
-        elif colour == 'red':
+        elif colour == "R":
             theta1 = 2.6
-        elif colour == 'green':
-            theta1 = -1.25
-        elif colour == 'yellow':
-            theta1 = 1.25
+        elif colour == "G":
+            theta1 = -1.5
+        elif colour == "Y":
+            theta1 = 1.5
 
         theta2 = -0.9
         theta3 = -0.93
@@ -227,6 +224,12 @@ def main():
         'state', # Topic name
         msg.Int16, # Message type
         store_state # Callback function (required)
+    )
+
+    sub = rospy.Subscriber(
+        'colour', # Topic name
+        msg.String, # Message type
+        store_colour # Callback function (required)
     )
 
     rospy.init_node('inverse_kinematics')

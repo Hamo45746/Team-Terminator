@@ -3,13 +3,14 @@
 ## Introduction
 This tutorial is provided as guidelines for setting up the given Ximea cameras with ROS.
 
-There will be three steps to this tutorial:
-- Step 1: Install the ROS Ximea Package
+There will be four steps to this tutorial:
+- Step 1: Install the ROS Ximxea Package
 - Step 2: Camera Calibration
 - Step 3: Setup the ArUco Tag Detection Library
 
 **Note:**
 - **This can be done on any Ubuntu 20.04 system with IO/USB access.**
+- **You cannot run the Ximea Camera on Construct/ROSjects or WSL.**
 - **You should run this natively, on the RPi4 or on a dual booted machine.**
 - **You will need to see the GUI for the calibration part of the tutorial.**
 - **Do not login with root, as this will affect your permissions.**
@@ -26,7 +27,7 @@ Then return to your workspace
 cd ~/catkin_ws/
 ```
 
-# Step 1: Install the ROS Ximea Package
+# Step 1: Install the ROS Ximxea Package
 
 ## Building the Packages
 You may need to install the dependency ```vision_msgs```
@@ -63,11 +64,11 @@ You can run the `ximea_demo` node, if it isn't already running.
 rosrun ximea_ros ximea_demo
 ```
 
-```console
+```
 rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.025 image:=/ximea_cam/image_raw camera:=/ximea_cam
 ```
 
 # Step 3: Setup the ArUco Tag Detection Library
 ```console
-roslaunch ximea_ros ximea_aruco.launch serial:=XXXXXXXX
+roslaunch ximea_ros ximea_aruco.launch
 ```

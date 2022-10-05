@@ -5,7 +5,7 @@
 
 XimeaROS::XimeaROS(int argc, char** argv) {
     ros::init(argc, argv, "ximea_camera");
-	exposure_time = 2500.0;
+	exposure_time = 8000.0;
 	gain = 0.0;
 }
 
@@ -51,6 +51,7 @@ void XimeaROS::send_image(std::string serial, cv::Mat img, std::string format) {
     // Create and publish the camera info
     sensor_msgs::CameraInfo info_camera = camera_info_manager[serial]->getCameraInfo();
     ros::Time now = ros::Time::now();
+    info_camera.header.frame_id = std::string("ximea_") + serial;
     info_camera.header.stamp = now;
     pub_camera_info[serial].publish(info_camera);
 }
