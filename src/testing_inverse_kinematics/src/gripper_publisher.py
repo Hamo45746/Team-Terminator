@@ -16,7 +16,6 @@ import math as m
 GET GRIPPER TO LOOK AT STATE SO DOESNT OPEN WHEN MOVEING TO INTERMEDIATE ETC
 '''
 
-print(1 <= 1.5 <= 3)
 
 
 
@@ -32,16 +31,22 @@ def move_gripper(i):
     open = 2000
     
     if i.data == (3):
-        print('gripper')
         # close gripper (grab block)
         rpi.set_servo_pulsewidth(18,grab)
         new_state = 4
-        pub.publish(new_state)
+        count = 0
+        while (count < 70):
+            pub.publish(new_state)
+            count+=1
+        print('finished close gripper')
 
     elif (i.data == 6):
         rpi.set_servo_pulsewidth(18,open)
         new_state = 1
-        pub.publish(new_state)
+        count=0
+        while (count < 70):
+            pub.publish(new_state)
+            count+=1
     #1000 is the closed position
     #1500 is the grip box position
     #2000 is the open position

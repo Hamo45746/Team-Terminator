@@ -22,7 +22,7 @@ state = 2
 #rpi = pigpio.pi()
 #rpi.set_mode(18, pigpio.OUTPUT)
 
-print('gripper running')
+print('pose publisher running')
 
 
 def store_state(i):
@@ -49,7 +49,7 @@ def publish_grab_joint(i):
 
 def publish_intermediate_joint(i):
     global state
-    if state==4:
+    if (state==4) or (state==1):
         pub.publish(i)
 
 def publish_drop_joint(i):
