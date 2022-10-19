@@ -27,7 +27,7 @@ print('gripper running')
 
 def move_gripper(i): 
     global been1
-    grab = 1450
+    grab = 1420
     open = 2000
     
     if i.data == (3):
@@ -35,7 +35,7 @@ def move_gripper(i):
         rpi.set_servo_pulsewidth(18,grab)
         new_state = 4
         count = 0
-        while (count < 70):
+        while (count < 40):
             pub.publish(new_state)
             count+=1
         print('finished close gripper')

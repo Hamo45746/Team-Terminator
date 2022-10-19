@@ -30,8 +30,7 @@ def store_state(i):
     global state
     state = i.data
 
-state=2
-
+#################################################################################################################################
 
 vertex_dict = {}
 
@@ -70,7 +69,7 @@ def publish_colour(i):
     #print(list(angle_dict.keys())[list(min(angle_dict.values()))])
 
     # logic if state==4
-    if 4==4:
+    if state==4:
         try:
             img = bridge.imgmsg_to_cv2(i, "bgr8")
             bgr = img[img.shape[0] // 2, img.shape[1] // 2, :]

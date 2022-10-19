@@ -11,6 +11,7 @@ from fiducial_msgs.msg import FiducialTransformArray
 from geometry_msgs.msg import Transform
 from geometry_msgs.msg import TransformStamped
 import numpy as np
+import std_msgs.msg as msg
 import tf2_ros
 from geometry_msgs.msg import Pose
 import geometry_msgs.msg
@@ -52,10 +53,16 @@ def trans(t: Transform):
     return np.matmul(T_C2A, T_A2R)
 
 
+
+def store_state(i):
+    global state
+    state = i.data
+
+
 # id for the camera
 #info_camera.header.frame_id = std::string("ximea_") + serial;
 
-
+loop_count = 0
 def T_C2R( p):
     # maybe use fiducial vertices to get colour?????????????
     global camera_to_robot_base
@@ -64,12 +71,14 @@ def T_C2R( p):
     global listener
     global sub_transform
     global tfBuffer
-    global msg
+    global msg,state
     
     #print('hi1')
     transform_array = []
     k=0
-    if p.transforms != []:
+    
+    if (p.transforms != []) and (state==2):
+
         for i,j in enumerate(p.transforms):
             #transform_array.append(j)
             #w = j.transform.rotation.w
@@ -100,9 +109,11 @@ def T_C2R( p):
                     [0 ,0 , -1, j.transform.translation.z],
                     [ 0, 0, 0, 1]
                 ]))
-            
-            k  +=1
-            print(k)
+
+
+            print(transform_array)
+            k +=1
+            print(state)
             #print(j_id)
             #print(j_id,'\n',j.transform.translation)
 
@@ -138,6 +149,39 @@ def T_C2R( p):
         msg.position.y =  robot_to_tag_1[1][3]
         msg.position.z = robot_to_tag_1[2][3]
 
+        pub.publish(msg)
+    elif state==4:
+        
+        transform_array.append(np.array([
+            [0 ,1 , 0, 0],
+            [1 ,0 , 0, -0.05],
+            [0 ,0 ,-1, 0.20],
+            [ 0, 0, 0, 1]
+        ]))
+        x_dist = -0.032
+        y_dist = -0.02
+        z_dist = -0.04
+        robot_base_to_robot_joint = np.array([
+                [1,0 , 0, x_dist],
+                [0,1 , 0, y_dist],
+                [0 ,0 , 1, z_dist],
+                [ 0, 0, 0, 1]
+        ])
+        print(state)
+        #print('cam to robot',camera_to_robot)
+        camera_to_tag_1 = transform_array[0]
+        #print('camner to tag',camera_to_tag_1)
+        ##camera_to_tag_2 = transform_array[1]
+        #camera_to_robot = 
+        robot_base_to_tag_1 = np.matmul(np.linalg.inv(camera_to_robot_base),camera_to_tag_1)
+        robot_to_tag_1 = np.matmul(np.linalg.inv(robot_base_to_robot_joint),robot_base_to_tag_1)
+        ##print(robot_to_tag_1)
+
+
+        msg = Pose()
+        msg.position.x = robot_to_tag_1[0][3]
+        msg.position.y =  robot_to_tag_1[1][3]
+        msg.position.z = robot_to_tag_1[2][3]
         pub.publish(msg)
     else:
         pub.publish(msg)
@@ -177,7 +221,11 @@ def main():
 
     pub = rospy.Publisher('desired_position', Pose, queue_size=10)
     #sub_transform = rospy.Subscriber('tf', Transform, trans)
-    
+    sub = rospy.Subscriber(
+        'state', # Topic name
+        msg.Int16, # Message type
+        store_state # Callback function (required)
+    )
     #sub_point = rospy.Subscriber('tf',TFMessage, T_C2R)#replace placeholders with actual topics
     sub_point = rospy.Subscriber('fiducial_transforms',FiducialTransformArray, T_C2R)#replace placeholders with actual topics
     rospy.init_node('Transform')
