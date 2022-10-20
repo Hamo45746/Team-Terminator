@@ -40,17 +40,13 @@ def move_gripper(i):
             count+=1
         print('finished close gripper')
 
-    elif (i.data == (6)):
+    elif (i.data == 6):
         rpi.set_servo_pulsewidth(18,open)
         new_state = 1
         count=0
         while (count < 70):
             pub.publish(new_state)
             count+=1
-
-    elif i.data == (0):
-        rpi.set_servo_pulsewidth(18,open)
-        
     #1000 is the closed position
     #1500 is the grip box position
     #2000 is the open position

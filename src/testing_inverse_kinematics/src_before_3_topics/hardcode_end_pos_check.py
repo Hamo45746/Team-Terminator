@@ -42,6 +42,7 @@ def store_drop(pose: JointState):
 
 
 
+
 been_1q_g = 0
 been_1q_i = 0
 been_1q_d = 0
@@ -63,8 +64,6 @@ def verify(joint_state: JointState): # passes in the desired state
     global grab_state, int_state,drop_state, state,been_1q_g,been_1q_i,been_1q_d,pub_close
     print('\n'',state:',(state),'\n')
     if len(joint_state.position) == 4:
-        
-        
         if (state==1):
             print("been 1 state 4or1:",been_1q_i)
             been_1q_g=0
@@ -119,12 +118,7 @@ def verify(joint_state: JointState): # passes in the desired state
 
 
                 been_1q_i=1
-        
-        elif state==3:
-            been_1q_g=0
-        
-        
-        elif (state==2) or (state==4):
+        if state==2:
             been_1q_d=0
             been_1q_i = 0
             current_theta4 = joint_state.position[0]
@@ -137,8 +131,8 @@ def verify(joint_state: JointState): # passes in the desired state
             desired_theta3 = grab_state.position[2]
             desired_theta4 = grab_state.position[3]
 
-            close_factor_low = 0.8
-            close_factor_high = 1.8
+            close_factor_low = 0.96
+            close_factor_high = 1.2
 
             print('current 1, desired 1:',current_theta1,desired_theta1)
 
@@ -163,12 +157,9 @@ def verify(joint_state: JointState): # passes in the desired state
             
             if (close_factor_low<= theta1_close_factor <= close_factor_high) and (been_1q_g==0) and (close_factor_low<= theta2_close_factor <= close_factor_high) and (close_factor_low<= theta3_close_factor <= close_factor_high) and (close_factor_low<= theta4_close_factor <= close_factor_high):
                 pub_close.publish(1)
-                
-                print('close factor true')
-                if state==2:
+                if state == 2:
                     pub_state.publish(3)
-                elif state==4: 
-                    pub_state.publish(5)
+
                 been_1q_g=1
                 '''
                 if state == 4:
@@ -198,14 +189,12 @@ def verify(joint_state: JointState): # passes in the desired state
                             header=Header(stamp=rospy.Time.now()),
                             name=['joint_1','joint_2', 'joint_3', 'joint_4']
                         )
-
                     msg.position = [
                         theta1,
                         theta2,
                         theta3,
                         theta4
                         ]   # THIS DOESNT INCLUDE HORIZONTAL  
-
                     pub_joint.publish(msg)
                     while current_theta1 < np.abs(desired_theta1*0.95):
                         print('hi')
@@ -213,8 +202,7 @@ def verify(joint_state: JointState): # passes in the desired state
                     #'''
         
 
-            '''
-        elif (state==4):
+        elif (state==4) :
             print("been 1 state 4or1:",been_1q_i)
             been_1q_g=0
             
@@ -223,14 +211,18 @@ def verify(joint_state: JointState): # passes in the desired state
             current_theta2 = joint_state.position[2]
             current_theta1 = joint_state.position[3]
 
-            
+            ''' 
+            desired_theta1 = int_state.position[0]
+            desired_theta2 = int_state.position[1]
+            desired_theta3 = int_state.position[2]
+            desired_theta4 = int_state.position[3]
+            #'''
             desired_theta1 = 0
-            desired_theta2 = -0.81
-            desired_theta3 = 0.01
-            desired_theta4 = -0.639783
+            desired_theta2 = -1
+            desired_theta3 = 0.35
+            desired_theta4 = -0.6
 
-
-            close_factor_low = 0.9
+            close_factor_low = 0.95
             close_factor_high = 1.1
 
             if desired_theta1 != float(0):
@@ -245,16 +237,16 @@ def verify(joint_state: JointState): # passes in the desired state
 
                 average = (theta1_close_factor + theta2_close_factor + theta3_close_factor + theta4_close_factor) / (4)
                 print(average)
-            else: 
+            else:
                 theta2_close_factor = np.abs(current_theta2 / desired_theta2)
                 theta3_close_factor = np.abs(current_theta3 / desired_theta3)
                 theta4_close_factor = np.abs(current_theta4 / desired_theta4)
                 average = (theta2_close_factor + theta3_close_factor + theta4_close_factor) / (3)
-                print('state 4 or 1 aaverga:', average)
+                print('state 4 aaverga:', average)
             print(been_1q_i)
-            print(current_theta2,desired_theta2,desired_theta2*0.8<= current_theta2 <= desired_theta2*1.2)
-
-            if (close_factor_low<= average <= close_factor_high) and (abs(desired_theta2*0.8) <= abs(current_theta2) <= abs(desired_theta2*1.2)) and (been_1q_i==0):
+            print(current_theta1,desired_theta1,'\n',current_theta2,desired_theta2,'\n',current_theta3,desired_theta3,'\n',current_theta4,desired_theta4,'\n')
+            print((close_factor_low<= average <= close_factor_high),(desired_theta2*1,2 <= current_theta2 <= desired_theta2*0.8),(desired_theta4*1.2<= current_theta4 <= desired_theta4*0.8), (desired_theta3*0.9 <= current_theta3 <= desired_theta3*1.2), (been_1q_i==0))
+            if (close_factor_low<= average <= close_factor_high) and (desired_theta2*1.2 <= current_theta2 <= desired_theta2*0.8) and (desired_theta4*1.2 <= current_theta4 <= desired_theta4*0.8) and (desired_theta3*0.9 <= current_theta3 <= desired_theta3*1.2) and (been_1q_i==0):
                 pub_close.publish(1)
 
                 print('close')
@@ -263,13 +255,15 @@ def verify(joint_state: JointState): # passes in the desired state
 
 
                 been_1q_i=1
-            #'''
+            
+
         elif state==5:
 
             current_theta4 = joint_state.position[0]
             current_theta3 = joint_state.position[1]
             current_theta2 = joint_state.position[2]
             current_theta1 = joint_state.position[3]
+
             
             desired_theta1 = drop_state.position[0]
             desired_theta2 = drop_state.position[1]
@@ -335,6 +329,7 @@ def main():
     )
     #'''
     # Create subscriber
+    
     sub = rospy.Subscriber(
         'desired_joint_states', # Topic name
         JointState, # Message type
@@ -346,7 +341,7 @@ def main():
         JointState, # Message type
         store_intermediate # Callback function (required)
     )
-
+    #'''
     sub = rospy.Subscriber(
         'desired_joint_states', # Topic name
         JointState, # Message type
@@ -377,17 +372,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-

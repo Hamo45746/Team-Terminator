@@ -51,8 +51,10 @@ def determine_if_moving(i):
 
             if (old_corners[0][0]*lower_bound <= tag.x0 <= old_corners[0][0]*upper_bound) and (old_corners[0][1]*lower_bound <= tag.y0 <= old_corners[0][1]*upper_bound):
                 print("same spot",'\n')
+                ismoving_pub.publish(0)
             else:
                 print("tag is moving",'\n')
+                ismoving_pub.publish(1)
         #if ([0][0] <= corner[0] <= old_pos_dict.get(tag.fiducial_id))
 
     for i,tag in enumerate(vertex.fiducials):

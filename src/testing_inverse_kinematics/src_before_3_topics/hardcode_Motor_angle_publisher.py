@@ -32,14 +32,13 @@ def store_state(i):
 
 
 state = 2
-loop_num = 0
 def inverse_kinematics(pose: Pose) -> JointState:
-    global pub_joint,colour,state,loop_num
+    global pub_joint,colour,state
     print('received')
     L1 = 0.055
     L2 = 0.118
     L3 = 0.094
-    L4 = 0.11
+    L4 = 0.1
     robot_origin = [0 , 0 , 0]
     print('\n'',state:',(state),'\n')
     if (state==1): # intermediate state
@@ -66,13 +65,13 @@ def inverse_kinematics(pose: Pose) -> JointState:
         while (i < 50):
             pub_joint.publish(msg)
             i += 1
-        '''
-    elif (state==4): # intermediate state
+
+    if (state == 4): # intermediate state
         print('IN PUBLISHER STATE 1')
         theta1 = 0
-        theta2 = -0.818
-        theta3 = 0
-        theta4 = -0.639783
+        theta2 = -1
+        theta3 = 0.35
+        theta4 = -0.5
 
         msg = JointState(
                 # Set header with current time
@@ -88,13 +87,13 @@ def inverse_kinematics(pose: Pose) -> JointState:
             theta4
             ]   
         i=0
-        while (i < 50):
+        while (i < 1):
             pub_joint.publish(msg)
             i += 1
-        #'''
+
 
     elif state == 5:
-        colour = 'B'
+        #colour = 'B'
         if colour == "B":
             theta1 = -2.6
         elif colour == "R":
@@ -123,87 +122,68 @@ def inverse_kinematics(pose: Pose) -> JointState:
             theta3,
             theta4
             ]   # THIS DOESNT INCLUDE HORIZONTAL  
-        
+
         pub_joint.publish(msg)
 
     #'''
-    
-    elif (state == 2) or (state==4):
-        print('hello')
+    elif state == 2:
         desired_x = pose.position.x
-        desired_y = pose.position.y
+        desired_y = pose.position.y +0.015
         desired_z = pose.position.z # elevation
+
         
-        #desired_x = 0.15
-        #desired_y = 0
-        #desired_z = 0.1
+        deg_0_threshhold = 0.22
+        deg_45_thresh = 0.16
 
-        if (state ==2) or (state==3):
-            desired_z=0.0
+        min_x = 0.08
+
+        if desired_x < deg_45_thresh:
+            desired_end_angle = -90 * (np.pi/180)
+            desired_z=-0.05
+        elif (deg_45_thresh <= desired_x <= deg_0_threshhold):
             desired_end_angle = -45 * (np.pi/180)
-        elif state==4:
-            desired_end_angle = 45 * (np.pi/180)
-
+            desired_z=-0.03
+        elif (desired_x > deg_0_threshhold):
+            desired_end_angle = -5 * (np.pi/180)
+            desired_z=0.0
+        
         theta1 = np.arctan2(desired_y,desired_x)
 
         desired_distance = np.sqrt(desired_x**2 + desired_y**2)
-        offset = 0.015
-        desired_distance_actual = desired_distance - L4*np.cos(desired_end_angle) - offset*np.sin(desired_end_angle)  #- np.sqrt(robot_origin[0]**2 + robot_origin[1]**2)
+        offset = 0.01
+        desired_distance_actual = desired_distance - L4*np.cos(desired_end_angle) - offset*np.sin(desired_end_angle)
         desired_elevation_actual = desired_z - L4*np.sin(desired_end_angle) - L1 - offset*np.cos(desired_end_angle)  
 
-        #'''
-
-        '''
-        desired_x_actual = desired_x - L4*np.cos(desired_end_angle)*np.cos(theta1) - robot_origin[0]
-        desired_y_actual = desired_y - L4*np.cos(desired_end_angle)*np.sin(theta1) - robot_origin[1]
-        desired_z_actual = desired_z - L4*np.sin(desired_end_angle) - robot_origin[2]
-
-        desired_distance_actual = np.sqrt(desired_x_actual**2 + desired_y_actual**2)
-        desired_elevation_actual = desired_z_actual
-        #'''
-
-        # using lecture slides, treat as 2d problem
         plus_or_minus = -1
         costheta3 = (desired_distance_actual**2 + desired_elevation_actual**2 - L2**2 - L3**2) / (2*L2*L3)
         theta3 = m.atan2(plus_or_minus*m.sqrt(1 - costheta3**2),costheta3)
         theta2 = m.atan2(desired_elevation_actual,desired_distance_actual) - np.arctan2(L2*np.sin(theta3),L2 + L3*np.cos(theta3))
-
-        theta2_abs = theta2
-        theta3_abs = theta2 + theta3
-        theta4_abs = desired_end_angle
         
-        if (state==4) and (loop_num == 5):
-            desired_end_angle = -45 * (np.pi/180)
-            loop_num += 1
         theta4 =  desired_end_angle - theta2 - theta3
 
-
-        # CORRECT THETA1 TO THE VERTICAL
-        if theta2_abs > np.pi/2: # > 90deg
-            theta2_abs = theta2_abs - np.pi/2
-        elif theta2_abs < np.pi/2:
-            theta2_abs = np.pi/2 - theta2_abs
+        # CORRECT THETA2 TO THE VERTICAL
+        if theta2 > np.pi/2: # > 90deg
+            theta2 = theta2 - np.pi/2
+        elif theta2 < np.pi/2:
+            theta2 = np.pi/2 - theta2
         
-        theta2=-theta2_abs
+        # Account for Dynamixel rotation directions
+        theta2=-theta2
         theta4=-theta4
 
-
-
         msg = JointState(
-                # Set header with current time
                 header=Header(stamp=rospy.Time.now()),
-                # Specify joint names (see `controller_config.yaml` under `dynamixel_interface/config`)
                 name=['joint_1','joint_2', 'joint_3', 'joint_4']
             )
 
         msg.position = [
-            theta1*1,
+            theta1,
             theta2,
             theta3,
             theta4
-            ]   # THIS DOESNT INCLUDE HORIZONTAL  
+            ]
         i=0
-        while (i < 30):
+        while (i < 1):
             pub_joint.publish(msg)
             i+=1
 
@@ -215,7 +195,7 @@ def main():
     pub_joint = rospy.Publisher(
         'desired_joint_states', # Topic name
         JointState, # Message type
-        queue_size=10 # Topic size (optional)
+        queue_size=50 # Topic size (optional)
     )
 
     pub_intermediate_state = rospy.Publisher(
@@ -257,5 +237,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

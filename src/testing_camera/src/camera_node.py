@@ -30,14 +30,17 @@ def store_state(i):
     global state
     state = i.data
 
-state=2
+def store_is_moving(i):
+    global is_moving
+    is_moving = i.data
 
+#################################################################################################################################
 
 vertex_dict = {}
 
 bridge = CvBridge()
 def publish_colour(i): 
-    global state,bridge,colour_pub,vertex
+    global state,bridge,colour_pub,vertex,is_moving,pub_state
     vertex_dict = {}
     for i,tag in enumerate(vertex.fiducials):
         vertex_dict[tag.fiducial_id] = [[tag.x0,tag.y0],[tag.x1,tag.y1],[tag.x2,tag.y2],[tag.x3,tag.y3]]
@@ -70,7 +73,7 @@ def publish_colour(i):
     #print(list(angle_dict.keys())[list(min(angle_dict.values()))])
 
     # logic if state==4
-    if 4==4:
+    if state==4:
         try:
             img = bridge.imgmsg_to_cv2(i, "bgr8")
             bgr = img[img.shape[0] // 2, img.shape[1] // 2, :]
@@ -95,7 +98,11 @@ def publish_colour(i):
             colour_pub.publish(rgbcolour)
         except:
             pass
-
+    # elif state==1:
+    #     # check is moving
+    #     if is_moving == 1:
+    #         # changwe stte
+    #         pub_state.publish(2)
 
 def store_vertex(i):
     global vertex
@@ -104,7 +111,7 @@ def store_vertex(i):
 
 
 if __name__ == '__main__':
-    global colour_pub,sub #viewer
+    global colour_pub,sub,pub_state #viewer
     # Create publisher
     #viewer = CameraViewer('31704051')
 
@@ -113,12 +120,17 @@ if __name__ == '__main__':
         msg.Int16, # Message type
         store_state # Callback function (required)
     )
+    sub = rospy.Subscriber(
+        'is_moving', # Topic name
+        msg.Int8, # Message type
+        store_is_moving # Callback function (required)
+    )
 
     image_sub = rospy.Subscriber(f"/ximea_ros/ximea_31704051/image_raw", Image, publish_colour)
     vertex_sub = rospy.Subscriber("fiducial_vertices", FiducialArray , store_vertex)
 
     colour_pub = rospy.Publisher("colour", msg.String, queue_size=10)
-
+    pub_state = rospy.Publisher("state", msg.Int16, queue_size=10)
 
 
     # Create subscriber
