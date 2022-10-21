@@ -29,7 +29,7 @@ def move_gripper(i):
     global been1
     grab = 1420
     open = 2000
-    
+    print('in move gripper')
     if i.data == (3):
         # close gripper (grab block)
         rpi.set_servo_pulsewidth(18,grab)
@@ -38,7 +38,7 @@ def move_gripper(i):
         while (count < 40):
             pub.publish(new_state)
             count+=1
-        print('finished close gripper')
+        print('finished close gripper\n\n\n\n\n\n\n\n')
 
     elif (i.data == (6)):
         rpi.set_servo_pulsewidth(18,open)
@@ -48,7 +48,7 @@ def move_gripper(i):
             pub.publish(new_state)
             count+=1
 
-    elif i.data == (0):
+    elif i.data == (1):
         rpi.set_servo_pulsewidth(18,open)
         
     #1000 is the closed position

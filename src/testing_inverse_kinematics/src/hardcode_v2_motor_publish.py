@@ -40,9 +40,9 @@ def inverse_kinematics(pose: Pose) -> JointState:
     L3 = 0.094
     L4 = 0.1
     robot_origin = [0 , 0 , 0]
-    print('\n'',state:',(state),'\n')
+    
     if (state==1): # intermediate state
-        print('IN PUBLISHER STATE 1')
+        
         theta1 = 0
         theta2 = 0.72   
         theta3 = -1.44
@@ -68,13 +68,13 @@ def inverse_kinematics(pose: Pose) -> JointState:
             i += 1
 
     if (state == 4): # intermediate state
-        print('IN PUBLISHER STATE 1')
+        
 
         desired_x = pose.position.x
         desired_y = pose.position.y
         desired_z = pose.position.z # elevation
 
-        desired_end_angle = 50 * (m.pi/180)
+        desired_end_angle = 60 * (m.pi/180)
         theta1 = np.arctan2(desired_y,desired_x)
 
         desired_distance = np.sqrt(desired_x**2 + desired_y**2)
@@ -154,9 +154,8 @@ def inverse_kinematics(pose: Pose) -> JointState:
     #'''
     elif state == 2:
         desired_x = pose.position.x
-        desired_y = pose.position.y +0
+        desired_y = pose.position.y + 0.025
         desired_z = pose.position.z # elevation
-
         
         deg_0_threshhold = 0.22
         deg_45_thresh = 0.16
@@ -167,13 +166,14 @@ def inverse_kinematics(pose: Pose) -> JointState:
             desired_end_angle = -90 * (np.pi/180)
             desired_z=-0.05
         elif (deg_45_thresh <= desired_x <= deg_0_threshhold):
-            desired_end_angle = -45 * (np.pi/180)
-            desired_z=-0.03
+            desired_end_angle = -90 * (np.pi/180)
+            desired_z=-0.04
         elif (desired_x > deg_0_threshhold):
             desired_end_angle = -5 * (np.pi/180)
             desired_z=0.0
         
-        theta1 = np.arctan2(desired_y,desired_x)
+        theta1 = np.arctan(desired_y/desired_x)
+        #print('\n\n\n\ndesired_y, theta1 ',desired_y,theta1,'\n\n\n')
 
         desired_distance = np.sqrt(desired_x**2 + desired_y**2)
         offset = 0.01
@@ -220,6 +220,7 @@ def inverse_kinematics(pose: Pose) -> JointState:
             )
         msg.position = [0,0,0,0]
         pub_joint.publish(msg)
+        #print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
         
 
 def main():
@@ -262,6 +263,7 @@ def main():
         inverse_kinematics # Callback function (required)
     )
     #'''
+    
     sub = rospy.Subscriber(
         'state', # Topic name
         msg.Int16, # Message type

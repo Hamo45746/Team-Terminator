@@ -65,6 +65,7 @@ def store_state(i):
 
 loop_count = 0
 def T_C2R( p):
+    print('converter')
     # maybe use fiducial vertices to get colour?????????????
     global camera_to_robot_base
     global pub
@@ -79,7 +80,7 @@ def T_C2R( p):
     k=0
     
     if (p.transforms != []) and (state==2):
-
+        print('in converter loop')
         for i,j in enumerate(p.transforms):
             #transform_array.append(j)
             #w = j.transform.rotation.w
@@ -212,7 +213,6 @@ def T_C2R( p):
 
 
 def main():
-    rospy.init_node('Transform')
     global pub
     global listener
     global sub_transform,tfBuffer

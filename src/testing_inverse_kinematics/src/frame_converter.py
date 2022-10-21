@@ -49,10 +49,10 @@ def trans(t: Transform):
 
     # Multiply transformation matrix by translation from aruco tag to robot base
 
-    T_A2R = np.array([1,0,0,x_dist],[0,1,0,y_dist],[0,0,1,z_dist],[0,0,0,1]) 
-    return np.matmul(T_C2A, T_A2R)
+    #T_A2R = np.array([1,0,0,x_dist],[0,1,0,y_dist],[0,0,1,z_dist],[0,0,0,1]) 
+    #return np.matmul(T_C2A, T_A2R)
 
-state=2
+
 
 
 def store_state(i):
@@ -65,6 +65,7 @@ def store_state(i):
 
 loop_count = 0
 def T_C2R( p):
+    print('converter')
     # maybe use fiducial vertices to get colour?????????????
     global camera_to_robot_base
     global pub
@@ -77,9 +78,8 @@ def T_C2R( p):
     #print('hi1')
     transform_array = []
     k=0
-    
-    if (p.transforms != []) and (state==2):
-
+    if (p.transforms != []) and (state==0):
+        print('in converter loop\n\n\n\n\n\n\n\n\n\n')
         for i,j in enumerate(p.transforms):
             #transform_array.append(j)
             #w = j.transform.rotation.w
@@ -103,7 +103,31 @@ def T_C2R( p):
                     [ 0, 0, 0, 1]
                 ])
                 loop_count=1
-            else:
+        msg = Pose()
+        msg.position.x = 0
+        msg.position.y = 0
+        msg.position.z = 0.2
+        pub.publish(msg)
+    
+    elif (p.transforms != []) and (state==2):
+        print('in converter loop')
+        for i,j in enumerate(p.transforms):
+            #transform_array.append(j)
+            #w = j.transform.rotation.w
+            #x = j.transform.rotation.x
+            #y = j.transform.rotation.y
+            #z = j.transform.rotation.z
+            #transform_array.append(np.array([
+            #    [2*((w**2)+(x**2))-1, 2*(x*y-w*z), 2*(x*z+w*y), j.transform.translation.x],
+            #    [2*(x*y+w*z), 2*((w**2)+(y**2))-1, 2*(y*z-w*x), j.transform.translation.y],
+            #    [2*(x*z-w*y), 2*(y*z+w*x), 2*((w**2)+(z**2))-1, j.transform.translation.z],
+            #    [ 0, 0, 0, 1]
+            #]))
+
+            j_id = j.fiducial_id
+        
+            if (j_id != 1):
+                print('\n\n\n\nin state 2 fiducial')
                 transform_array.append(np.array([
                     [0 ,1 , 0, j.transform.translation.x],
                     [1 ,0 , 0, j.transform.translation.y],
@@ -112,7 +136,7 @@ def T_C2R( p):
                 ]))
 
 
-            print(transform_array)
+            #print(transform_array)
             k +=1
             print(state)
             #print(j_id)
@@ -126,9 +150,9 @@ def T_C2R( p):
         #        [0 ,0 , -1, z_dist],
         #        [ 0, 0, 0, 1]
         #    ])
-        x_dist = -0.032
-        y_dist = -0.02
-        z_dist = -0.04
+        x_dist = -0.035
+        y_dist = -0.014
+        z_dist = -0.038
         robot_base_to_robot_joint = np.array([
                 [1,0 , 0, x_dist],
                 [0,1 , 0, y_dist],
@@ -142,26 +166,26 @@ def T_C2R( p):
         #camera_to_robot = 
         robot_base_to_tag_1 = np.matmul(np.linalg.inv(camera_to_robot_base),camera_to_tag_1)
         robot_to_tag_1 = np.matmul(np.linalg.inv(robot_base_to_robot_joint),robot_base_to_tag_1)
-        ##print(robot_to_tag_1)
+        print(robot_to_tag_1)
 
 
         msg = Pose()
         msg.position.x = robot_to_tag_1[0][3]
         msg.position.y =  robot_to_tag_1[1][3]
         msg.position.z = robot_to_tag_1[2][3]
-
         pub.publish(msg)
+
     elif state==4:
         
         transform_array.append(np.array([
-            [0 ,1 , 0, 0],
-            [1 ,0 , 0, -0.025],
-            [0 ,0 ,-1, 0.25],
+            [0 ,1 , 0, 0.01],
+            [1 ,0 , 0, -0.035],
+            [0 ,0 ,-1, 0.22],
             [ 0, 0, 0, 1]
         ]))
-        x_dist = -0.032
-        y_dist = -0.02
-        z_dist = -0.04
+        x_dist = -0.035
+        y_dist = -0.014
+        z_dist = -0.038
         robot_base_to_robot_joint = np.array([
                 [1,0 , 0, x_dist],
                 [0,1 , 0, y_dist],
@@ -185,7 +209,10 @@ def T_C2R( p):
         msg.position.z = robot_to_tag_1[2][3]
         pub.publish(msg)
     else:
-        
+        msg = Pose()
+        msg.position.x = 0
+        msg.position.y = 0
+        msg.position.z = 0.2
         pub.publish(msg)
 
 
@@ -212,7 +239,6 @@ def T_C2R( p):
 
 
 def main():
-    rospy.init_node('Transform')
     global pub
     global listener
     global sub_transform,tfBuffer

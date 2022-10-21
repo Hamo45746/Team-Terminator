@@ -54,7 +54,7 @@ def store_state(i):
     state = i.data
  
 def end_pos_check (des_thetaL, act_thetaL, cfl, cfh):
-    print(des_thetaL,'\n',act_thetaL)
+    
     for i in range(4):
         des_thetaL[i] = des_thetaL[i]*(180/m.pi)
         act_thetaL[i] = act_thetaL[i]*(180/m.pi)
@@ -90,7 +90,7 @@ def verify(joint_state: JointState): # passes in the desired state
     print("verify")
 
     global grab_state, colour_state,drop_state, state,pub_close,is_moving
-    print('\n'',state:',(state),'\n')
+   
     if len(joint_state.position) == 4:
         
         #assign variables
@@ -103,21 +103,24 @@ def verify(joint_state: JointState): # passes in the desired state
             des_thetaL = [0,0,0,0] #desired theta list [ theta1, theta2, theta3, theta4]
             correct_pos = end_pos_check(des_thetaL, act_thetaL, cfl, cfh)
             if correct_pos == True:
-                rospy.sleep(5)
+                rospy.sleep(2)
                 pub_state.publish(1)
 
         elif state == 1:
             cfl = 0.9 #close factor low
-            cfh = 1.1 #close factor high
+            cfh = 1.3 #close factor high
             des_thetaL = [0, 0.72,-1.44,0.112] #desired theta list [ theta1, theta2, theta3, theta4]
             correct_pos = end_pos_check(des_thetaL, act_thetaL, cfl, cfh)
             if correct_pos == True:
                 if is_moving == 0:
-                    pub_state.publish(2)
-        
+                    i=0
+                    while i<2:
+                        pub_state.publish(2)
+                        i+=1
+
         elif state == 2:
-            cfl = 0.88 #close factor low
-            cfh = 1.12#close factor high
+            cfl = 0.96 #close factor low
+            cfh = 1.2#close factor high
             des_thetaL = [grab_state.position[0], grab_state.position[1],grab_state.position[2],grab_state.position[3]]
             #desired theta list [ theta1, theta2, theta3, theta4]
 
@@ -128,17 +131,14 @@ def verify(joint_state: JointState): # passes in the desired state
         elif state == 4:
             
             cfl = 0.9 #close factor low
-            cfh = 1.1 #close factor high
+            cfh = 1.5 #close factor high
             des_thetaL = [colour_state.position[0],colour_state.position[1],colour_state.position[2],colour_state.position[3]] #[0, -1,0.35,-0.5] #[grab_state.position[0], grab_state.position[1],grab_state.position[2],grab_state.position[3]]
             #desired theta list [ theta1, theta2, theta3, theta4]
             
             correct_pos = end_pos_check(des_thetaL, act_thetaL, cfl, cfh)
             if correct_pos == True:
-                i=0
-                while i<100:
-                    #print('loop')
-                    i+=1      
-                rospy.sleep(2)
+                i=0  
+                rospy.sleep(1)
                 pub_state.publish(5)
 
         elif state == 5:

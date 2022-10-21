@@ -59,8 +59,7 @@ def publish_colour(i):
         if angle_dict.get(tag) < lowest:
             lowest = angle_dict.get(tag)
             id_tag = tag
-    print('angles:',angle_dict,'\n\n')
-    print('lowest angle id:',id_tag)
+
     '''
     lowest = 10000
     for tag in vertex_dict:
