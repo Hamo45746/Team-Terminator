@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 
-from telnetlib import X3PAD
 import rospy
 
 from geometry_msgs.msg import Point
@@ -16,8 +15,6 @@ import std_msgs.msg as msg
 import tf2_ros
 from geometry_msgs.msg import Pose
 import geometry_msgs.msg
-from fiducial_msgs.msg import FiducialArray
-
 
 
 def trans(t: Transform):
@@ -52,51 +49,38 @@ def trans(t: Transform):
 
     # Multiply transformation matrix by translation from aruco tag to robot base
 
-    #T_A2R = np.array([1,0,0,x_dist],[0,1,0,y_dist],[0,0,1,z_dist],[0,0,0,1]) 
-    #return np.matmul(T_C2A, T_A2R)
+    T_A2R = np.array([1,0,0,x_dist],[0,1,0,y_dist],[0,0,1,z_dist],[0,0,0,1]) 
+    return np.matmul(T_C2A, T_A2R)
 
-
+state=2
 
 
 def store_state(i):
     global state
     state = i.data
 
-def store_vertex(i):
-    global vertex
-    vertex = i
 
 # id for the camera
 #info_camera.header.frame_id = std::string("ximea_") + serial;
 
-
-
 loop_count = 0
-def T_C2R(p):
+def T_C2R( p):
+    print('converter')
     # maybe use fiducial vertices to get colour?????????????
-    global camera_to_robot_base # idk why this is global
+    global camera_to_robot_base
     global pub
     global loop_count
     global listener
     global sub_transform
     global tfBuffer
-    global msg,state,vertex,pub_ignore,camera_to_robot
-    print('converter outside of if statements: state=',state)
+    global msg,state
     
     #print('hi1')
     transform_array = []
     k=0
-
-    #camera_to_robot = np.array([[],[],[],[]])
-    if (state==0):
-        print('in state 0 converter loop','\n\n\n\n')
-        
-       
-
-    elif (p.transforms != []) and (state==2):
+    
+    if (p.transforms != []) and (state==2):
         print('in converter loop')
-        lowest_theta_set = 10000
-        lowest_theta = lowest_theta_set
         for i,j in enumerate(p.transforms):
             #transform_array.append(j)
             #w = j.transform.rotation.w
@@ -111,84 +95,74 @@ def T_C2R(p):
             #]))
 
             j_id = j.fiducial_id
-            if (j_id != 1) and (j_id!=2):
-                '''
-                # for tag id = 1:
-                x_dist = -0.027
-                y_dist = -0.0
-                z_dist = -0.042
-                '''
-                # for tag id = 2:
-                x_dist = -0.014
-                y_dist = -0.03
-                z_dist = -0.042
-                cam_to_robot_x = 0
-                cam_to_robot_y = -0.203
-                cam_to_robot_z = 0.376
 
-                camera_to_robot =  np.array([
-                    [0 ,1 , 0, cam_to_robot_x],
-                    [1 ,0 , 0, cam_to_robot_y],
-                    [0 ,0 , -1, cam_to_robot_z],
-                    [ 0, 0, 0, 1]
-                ])
-                #print('cam to robot',camera_to_robot)
-                camera_to_tag_1 = np.array([
+            if (j_id == 1) and (loop_count==0):
+                camera_to_robot_base =  np.array([
                     [0 ,1 , 0, j.transform.translation.x],
                     [1 ,0 , 0, j.transform.translation.y],
                     [0 ,0 , -1, j.transform.translation.z],
                     [ 0, 0, 0, 1]
                 ])
-                #print(camera_to_tag_1)
-                
-                print(camera_to_robot)
-                robot_to_tag_1 = np.matmul(np.linalg.inv(camera_to_robot),camera_to_tag_1)
-                print('robot to tag state 2',robot_to_tag_1)
-
-                desired_y = robot_to_tag_1[1][3]
-                desired_x = robot_to_tag_1[0][3]
-                theta1 = np.arctan(desired_y/desired_x)
-
-                x0 = vertex.fiducials[0].x0
-                y0 = vertex.fiducials[0].y0
-                x1 = vertex.fiducials[0].x1
-                y1 = vertex.fiducials[0].y1
-                x2 = vertex.fiducials[0].x2
-                y2 = vertex.fiducials[0].y2
-
-                block_theta = min(abs(np.arctan((y1-y0) / (x1-x0))),abs(np.arctan((y2-y1) / (x2-x1))))
-                relative_theta = abs(theta1) - block_theta
-                print('in loop here')
-                print('angles,theta1,block',theta1,block_theta)
-                if (abs(relative_theta) < lowest_theta) and (abs(relative_theta) < (20*(np.pi/180))):
-                    lowest_theta = abs(relative_theta)
-                    lowest_theta_transform = robot_to_tag_1
-                # need to see if the angle is greater than a threshold #################################################################################
-        print('\n\n\n\n',lowest_theta,'\n\n\n\n')
-        
-        if lowest_theta != lowest_theta_set:
-            msg = Pose()
-            msg.position.x = lowest_theta_transform[0][3]
-            msg.position.y =  lowest_theta_transform[1][3]
-            msg.position.z = lowest_theta_transform[2][3]
-            
-            i=0
-            while i < 3:
-                pub.publish(msg)
-                i+=1
+                loop_count=1
+            else:
+                transform_array.append(np.array([
+                    [0 ,1 , 0, j.transform.translation.x],
+                    [1 ,0 , 0, j.transform.translation.y],
+                    [0 ,0 , -1, j.transform.translation.z],
+                    [ 0, 0, 0, 1]
+                ]))
 
 
+            print(transform_array)
+            k +=1
+            print(state)
+            #print(j_id)
+            #print(j_id,'\n',j.transform.translation)
+
+        # id is 17
+
+        #camera_to_robot = np.array([
+        #        [0,1 , 0, x_dist],
+        #        [1,0 , 0, y_dist],
+        #        [0 ,0 , -1, z_dist],
+        #        [ 0, 0, 0, 1]
+        #    ])
+        x_dist = -0.032
+        y_dist = -0.02
+        z_dist = -0.04
+        robot_base_to_robot_joint = np.array([
+                [1,0 , 0, x_dist],
+                [0,1 , 0, y_dist],
+                [0 ,0 , 1, z_dist],
+                [ 0, 0, 0, 1]
+        ])
+        #print('cam to robot',camera_to_robot)
+        camera_to_tag_1 = transform_array[0]
+        #print('camner to tag',camera_to_tag_1)
+        ##camera_to_tag_2 = transform_array[1]
+        #camera_to_robot = 
+        robot_base_to_tag_1 = np.matmul(np.linalg.inv(camera_to_robot_base),camera_to_tag_1)
+        robot_to_tag_1 = np.matmul(np.linalg.inv(robot_base_to_robot_joint),robot_base_to_tag_1)
+        ##print(robot_to_tag_1)
+
+
+        msg = Pose()
+        msg.position.x = robot_to_tag_1[0][3]
+        msg.position.y =  robot_to_tag_1[1][3]
+        msg.position.z = robot_to_tag_1[2][3]
+
+        pub.publish(msg)
     elif state==4:
         
         transform_array.append(np.array([
-            [0 ,1 , 0, 0.0],
-            [1 ,0 , 0, -0.03],
-            [0 ,0 ,-1, 0.22],
+            [0 ,1 , 0, 0],
+            [1 ,0 , 0, -0.025],
+            [0 ,0 ,-1, 0.25],
             [ 0, 0, 0, 1]
         ]))
-        x_dist = -0.035
-        y_dist = -0.014
-        z_dist = -0.038
+        x_dist = -0.032
+        y_dist = -0.02
+        z_dist = -0.04
         robot_base_to_robot_joint = np.array([
                 [1,0 , 0, x_dist],
                 [0,1 , 0, y_dist],
@@ -212,13 +186,9 @@ def T_C2R(p):
         msg.position.z = robot_to_tag_1[2][3]
         pub.publish(msg)
     else:
-        print('empty  transform, not in state 0, 2, or 4')
-    #    msg = Pose()
-    #    msg.position.x = 0
-    #    msg.position.y = 0
-    #    msg.position.z = 0.2
-    #    pub.publish(msg)
-    camera_to_tag_1 = np.zeros((4,4))
+        
+        pub.publish(msg)
+
 
     #this is how to do it with tfmessage
     #print(p.transforms[0].child_frame_id,p.transforms[0].transform.translation)
@@ -245,12 +215,11 @@ def T_C2R(p):
 def main():
     global pub
     global listener
-    global sub_transform,tfBuffer,pub_ignore
+    global sub_transform,tfBuffer
     
     #tfBuffer = tf2_ros.Buffer()
     #listener = tf2_ros.TransformListener(tfBuffer)
     sub_transform = np.array([[1,0,0,0],[0,1,0,-0.3],[0,0,1,0.5],[0,0,0,1]])
-    pub_ignore = rospy.Publisher('ignore_fiducials',msg.String, queue_size=10)
 
     pub = rospy.Publisher('desired_position', Pose, queue_size=10)
     #sub_transform = rospy.Subscriber('tf', Transform, trans)
@@ -259,7 +228,6 @@ def main():
         msg.Int16, # Message type
         store_state # Callback function (required)
     )
-    vertex_sub = rospy.Subscriber("fiducial_vertices", FiducialArray , store_vertex)
     #sub_point = rospy.Subscriber('tf',TFMessage, T_C2R)#replace placeholders with actual topics
     sub_point = rospy.Subscriber('fiducial_transforms',FiducialTransformArray, T_C2R)#replace placeholders with actual topics
     rospy.init_node('frame_converter')

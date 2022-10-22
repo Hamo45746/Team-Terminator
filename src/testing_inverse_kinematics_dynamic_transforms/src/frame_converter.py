@@ -70,6 +70,7 @@ def store_vertex(i):
 #info_camera.header.frame_id = std::string("ximea_") + serial;
 
 
+pub_ignore.publish('')
 
 loop_count = 0
 def T_C2R(p):
@@ -80,23 +81,54 @@ def T_C2R(p):
     global listener
     global sub_transform
     global tfBuffer
-    global msg,state,vertex,pub_ignore,camera_to_robot
+    global msg,state,vertex,pub_ignore
     print('converter outside of if statements: state=',state)
     
     #print('hi1')
     transform_array = []
     k=0
 
-    #camera_to_robot = np.array([[],[],[],[]])
-    if (state==0):
-        print('in state 0 converter loop','\n\n\n\n')
-        
-       
+    if (p.transforms != []) and (state==0):
+        print('in state 0 converter loop')
+        for i,j in enumerate(p.transforms):
+            #transform_array.append(j)
+            #w = j.transform.rotation.w
+            #x = j.transform.rotation.x
+            #y = j.transform.rotation.y
+            #z = j.transform.rotation.z
+            #transform_array.append(np.array([
+            #    [2*((w**2)+(x**2))-1, 2*(x*y-w*z), 2*(x*z+w*y), j.transform.translation.x],
+            #    [2*(x*y+w*z), 2*((w**2)+(y**2))-1, 2*(y*z-w*x), j.transform.translation.y],
+            #    [2*(x*z-w*y), 2*(y*z+w*x), 2*((w**2)+(z**2))-1, j.transform.translation.z],
+            #    [ 0, 0, 0, 1]
+            #]))
 
+            j_id = j.fiducial_id
+            print('id for tags state 0',j_id)
+            if (j_id == 2):
+
+                print('\n\n\n\n\n\n detected id=1','\n\n\n')
+                camera_to_robot_base =  np.array([
+                    [0 ,1 , 0, j.transform.translation.x],
+                    [1 ,0 , 0, j.transform.translation.y],
+                    [0 ,0 , -1, j.transform.translation.z],
+                    [ 0, 0, 0, 1]
+               
+                ])
+                #pub_ignore.publish('2')
+                #pub_ignore.publish('1')
+
+                print(camera_to_robot_base)
+
+        #msg = Pose()
+        #msg.position.x = 0
+        #msg.position.y = 0
+        #msg.position.z = 0.2
+        
+    
     elif (p.transforms != []) and (state==2):
         print('in converter loop')
-        lowest_theta_set = 10000
-        lowest_theta = lowest_theta_set
+        lowest_theta = 10000
         for i,j in enumerate(p.transforms):
             #transform_array.append(j)
             #w = j.transform.rotation.w
@@ -122,15 +154,11 @@ def T_C2R(p):
                 x_dist = -0.014
                 y_dist = -0.03
                 z_dist = -0.042
-                cam_to_robot_x = 0
-                cam_to_robot_y = -0.203
-                cam_to_robot_z = 0.376
-
-                camera_to_robot =  np.array([
-                    [0 ,1 , 0, cam_to_robot_x],
-                    [1 ,0 , 0, cam_to_robot_y],
-                    [0 ,0 , -1, cam_to_robot_z],
-                    [ 0, 0, 0, 1]
+                robot_base_to_robot_joint = np.array([
+                        [1,0 , 0, x_dist],
+                        [0,1 , 0, y_dist],
+                        [0 ,0 , 1, z_dist],
+                        [ 0, 0, 0, 1]
                 ])
                 #print('cam to robot',camera_to_robot)
                 camera_to_tag_1 = np.array([
@@ -141,8 +169,8 @@ def T_C2R(p):
                 ])
                 #print(camera_to_tag_1)
                 
-                print(camera_to_robot)
-                robot_to_tag_1 = np.matmul(np.linalg.inv(camera_to_robot),camera_to_tag_1)
+                robot_base_to_tag_1 = np.matmul(np.linalg.inv(camera_to_robot_base),camera_to_tag_1)
+                robot_to_tag_1 = np.matmul(np.linalg.inv(robot_base_to_robot_joint),robot_base_to_tag_1)
                 print('robot to tag state 2',robot_to_tag_1)
 
                 desired_y = robot_to_tag_1[1][3]
@@ -156,26 +184,29 @@ def T_C2R(p):
                 x2 = vertex.fiducials[0].x2
                 y2 = vertex.fiducials[0].y2
 
-                block_theta = min(abs(np.arctan((y1-y0) / (x1-x0))),abs(np.arctan((y2-y1) / (x2-x1))))
+                block_theta = min(abs(np.arctan((y1-y0) / (x1-x0))),abs((y2-y1) / (x2-x1)))
                 relative_theta = abs(theta1) - block_theta
                 print('in loop here')
-                print('angles,theta1,block',theta1,block_theta)
-                if (abs(relative_theta) < lowest_theta) and (abs(relative_theta) < (20*(np.pi/180))):
-                    lowest_theta = abs(relative_theta)
+                if relative_theta < lowest_theta:
+                    lowest_theta = relative_theta
                     lowest_theta_transform = robot_to_tag_1
                 # need to see if the angle is greater than a threshold #################################################################################
-        print('\n\n\n\n',lowest_theta,'\n\n\n\n')
+        print('\n\n\n\n\n\n',lowest_theta,'\n\n\n\n')
+
+
+
+
+
+
+        msg = Pose()
+        msg.position.x = lowest_theta_transform[0][3]
+        msg.position.y =  lowest_theta_transform[1][3]
+        msg.position.z = lowest_theta_transform[2][3]
         
-        if lowest_theta != lowest_theta_set:
-            msg = Pose()
-            msg.position.x = lowest_theta_transform[0][3]
-            msg.position.y =  lowest_theta_transform[1][3]
-            msg.position.z = lowest_theta_transform[2][3]
-            
-            i=0
-            while i < 3:
-                pub.publish(msg)
-                i+=1
+        i=0
+        while i < 1:
+            pub.publish(msg)
+            i+=1
 
 
     elif state==4:
@@ -212,13 +243,13 @@ def T_C2R(p):
         msg.position.z = robot_to_tag_1[2][3]
         pub.publish(msg)
     else:
-        print('empty  transform, not in state 0, 2, or 4')
+        print('empty transform')
     #    msg = Pose()
     #    msg.position.x = 0
     #    msg.position.y = 0
     #    msg.position.z = 0.2
     #    pub.publish(msg)
-    camera_to_tag_1 = np.zeros((4,4))
+
 
     #this is how to do it with tfmessage
     #print(p.transforms[0].child_frame_id,p.transforms[0].transform.translation)

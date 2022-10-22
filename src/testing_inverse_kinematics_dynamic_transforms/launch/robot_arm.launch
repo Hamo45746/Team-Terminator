@@ -7,7 +7,7 @@
     
 
 
-    <node name="hardcode_v2_motor_publish" pkg="testing_inverse_kinematics" type="hardcode_v2_motor_publish.py"  />
+    <node name="hardcode_v2_motor_publish" pkg="testing_inverse_kinematics" type="hardcode_v2_motor_publish.py"  output='screen' />
     <node name="gripper_publisher" pkg="testing_inverse_kinematics" type="gripper_publisher.py" />
     <node name="rhys_end_pos_check" pkg="testing_inverse_kinematics" type="rhys_end_pos_check.py"/>
 

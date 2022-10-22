@@ -84,10 +84,10 @@ def inverse_kinematics(pose):
 
     elif state == 2:
         desired_x = desired_position.position.x
-        desired_y = desired_position.position.y  #+ 0.025 + desired_position.position.y*0.11  
+        desired_y = desired_position.position.y #+ 0.025 + desired_position.position.y*0.11  
         desired_z = desired_position.position.z # elevation
         
-        deg_0_threshhold = 0.19
+        deg_0_threshhold = 0.22
         deg_45_thresh = 0.16
 
         min_x = 0.08
@@ -104,50 +104,50 @@ def inverse_kinematics(pose):
             desired_end_angle = -5 * (np.pi/180)
             # for the actual rig: desired_z=0.02
             desired_z=0.02
-        #try:
-        theta1 = np.arctan(desired_y/desired_x)
-        #print('\n\n\n\ndesired_y, theta1 ',desired_y,theta1,'\n\n\n')
+        try:
+            theta1 = np.arctan(desired_y/desired_x)
+            #print('\n\n\n\ndesired_y, theta1 ',desired_y,theta1,'\n\n\n')
 
-        #desired_distance = np.sqrt(desired_x**2 + desired_y**2)
-        offset = 0.01
-        desired_distance_actual = desired_distance - L4*np.cos(desired_end_angle) - offset*np.sin(desired_end_angle)
-        desired_elevation_actual = desired_z - L4*np.sin(desired_end_angle) - L1 - offset*np.cos(desired_end_angle)  
+            #desired_distance = np.sqrt(desired_x**2 + desired_y**2)
+            offset = 0.01
+            desired_distance_actual = desired_distance - L4*np.cos(desired_end_angle) - offset*np.sin(desired_end_angle)
+            desired_elevation_actual = desired_z - L4*np.sin(desired_end_angle) - L1 - offset*np.cos(desired_end_angle)  
 
-        plus_or_minus = -1
-        costheta3 = (desired_distance_actual**2 + desired_elevation_actual**2 - L2**2 - L3**2) / (2*L2*L3)
-        theta3 = m.atan2(plus_or_minus*m.sqrt(1 - costheta3**2),costheta3)
-        theta2 = m.atan2(desired_elevation_actual,desired_distance_actual) - np.arctan2(L2*np.sin(theta3),L2 + L3*np.cos(theta3))
-        
-        theta4 =  desired_end_angle - theta2 - theta3
+            plus_or_minus = -1
+            costheta3 = (desired_distance_actual**2 + desired_elevation_actual**2 - L2**2 - L3**2) / (2*L2*L3)
+            theta3 = m.atan2(plus_or_minus*m.sqrt(1 - costheta3**2),costheta3)
+            theta2 = m.atan2(desired_elevation_actual,desired_distance_actual) - np.arctan2(L2*np.sin(theta3),L2 + L3*np.cos(theta3))
+            
+            theta4 =  desired_end_angle - theta2 - theta3
 
-        # CORRECT THETA2 TO THE VERTICAL
-        if theta2 > np.pi/2: # > 90deg
-            theta2 = theta2 - np.pi/2
-        elif theta2 < np.pi/2:
-            theta2 = np.pi/2 - theta2
-        
-        # Account for Dynamixel rotation directions
-        theta2=-theta2
-        theta4=-theta4
+            # CORRECT THETA2 TO THE VERTICAL
+            if theta2 > np.pi/2: # > 90deg
+                theta2 = theta2 - np.pi/2
+            elif theta2 < np.pi/2:
+                theta2 = np.pi/2 - theta2
+            
+            # Account for Dynamixel rotation directions
+            theta2=-theta2
+            theta4=-theta4
 
-        msg = JointState(
-                header=Header(stamp=rospy.Time.now()),
-                name=['joint_1','joint_2', 'joint_3', 'joint_4']
-            )
+            msg = JointState(
+                    header=Header(stamp=rospy.Time.now()),
+                    name=['joint_1','joint_2', 'joint_3', 'joint_4']
+                )
 
-        msg.position = [
-            theta1,
-            theta2,
-            theta3,
-            theta4
-            ]
-        i=0
-        while (i < 30):
-            pub_joint.publish(msg)
-            pub_grab_state.publish(msg)
-            i+=1
-        #except:
-        #        print("\n\n\nmath was wrong\n\n\n")
+            msg.position = [
+                theta1,
+                theta2,
+                theta3,
+                theta4
+                ]
+            i=0
+            while (i < 30):
+                pub_joint.publish(msg)
+                pub_grab_state.publish(msg)
+                i+=1
+        except:
+                print("\n\n\nmath was wrong\n\n\n")
 
 
 
@@ -206,27 +206,19 @@ def inverse_kinematics(pose):
     elif state == 5:
         #colour = 'B'
         if colour == "B":
-            theta1 = -0.2
+            theta1 = -2.6
         elif colour == "R":
-            theta1 = 0.2
+            theta1 = 2.6
         elif colour == "G":
-            theta1 = -1.19
+            theta1 = -1.5
         elif colour == "Y":
-            theta1 = 1.19
+            theta1 = 1.5
         else:
-            pub_state.publish(1)
+            theta1=0.1
 
-        ''' These were for not flipping over
-        theta2 = -0.472
-        theta3 = -1.52
-        theta4 = 0.578
-        '''
-
-        theta2 = 0.48
-        theta3 = 1.54
-        theta4 = -0.92
-        
-
+        theta2 = -0.9
+        theta3 = -0.93
+        theta4 = 0.44
 
         msg = JointState(
                 # Set header with current time

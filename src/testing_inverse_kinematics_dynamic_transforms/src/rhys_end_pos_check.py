@@ -107,7 +107,7 @@ def verify(joint_state: JointState): # passes in the desired state
                 pub_state.publish(1)
 
         elif state == 1:
-            cfl = 0.8 #close factor low
+            cfl = 0.9 #close factor low
             cfh = 1.3 #close factor high
             des_thetaL = [0, 0.72,-1.44,0.112] #desired theta list [ theta1, theta2, theta3, theta4]
             correct_pos = end_pos_check(des_thetaL, act_thetaL, cfl, cfh)
@@ -120,7 +120,7 @@ def verify(joint_state: JointState): # passes in the desired state
 
         elif state == 2:
             cfl = 0.96 #close factor low
-            cfh = 1.3#close factor high
+            cfh = 1.2#close factor high
             des_thetaL = [grab_state.position[0], grab_state.position[1],grab_state.position[2],grab_state.position[3]]
             #desired theta list [ theta1, theta2, theta3, theta4]
 
@@ -145,7 +145,7 @@ def verify(joint_state: JointState): # passes in the desired state
 
         elif state == 5:
             
-            cfl = 0.95 #close factor low
+            cfl = 0.9 #close factor low
             cfh = 1.1 #close factor high
             des_thetaL = [drop_state.position[0], drop_state.position[1],drop_state.position[2],drop_state.position[3]]
             #desired theta list [ theta1, theta2, theta3, theta4]
