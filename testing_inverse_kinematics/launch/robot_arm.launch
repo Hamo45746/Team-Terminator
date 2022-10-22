@@ -1,0 +1,25 @@
+<launch>
+    <node name="frame_converter" pkg="testing_inverse_kinematics" type="frame_converter.py" output='screen'/>
+    <node name="dynamixel_interface_controller_node" pkg="dynamixel_interface" type="dynamixel_interface_controller_node" >
+		<rosparam command="load" file="$(find dynamixel_interface)/config/controller_config.yaml" />
+	</node>
+    
+    
+
+
+    <node name="hardcode_v2_motor_publish" pkg="testing_inverse_kinematics" type="hardcode_v2_motor_publish.py"  output='screen' />
+    <node name="gripper_publisher" pkg="testing_inverse_kinematics" type="gripper_publisher.py" />
+    <node name="rhys_end_pos_check" pkg="testing_inverse_kinematics" type="rhys_end_pos_check.py"/>
+
+    <node name="moving_checker" pkg="testing_inverse_kinematics" type="moving_checker.py" />
+    <node name="camera_node" pkg="testing_inverse_kinematics" type="camera_node.py" />
+
+    <include file="$(find ximea_ros)/launch/ximea_aruco.launch"/>
+
+    <node name="ximea_demo" pkg="ximea_ros" type="ximea_demo" />
+    <node name="ximea_color" pkg="ximea_color" type="example_camera.py" />
+
+</launch>
+
+
+
