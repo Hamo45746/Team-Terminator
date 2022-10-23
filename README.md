@@ -41,7 +41,7 @@ To clone and run this project, you will need [Ubuntu MATE v20.04](https://ubuntu
 Once ROS is installed, in the Ubuntu terminal the controller can be launched using the command:
 
 ```bash
-roslaunch tbd
+roslaunch team12 robot_arm.launch
 ```
 
 ## Credits
