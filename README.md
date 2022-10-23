@@ -1,12 +1,17 @@
-# Team Terminator
+# METR4202 Team Project - Group 12
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 
-Welcome to the robozone :o<br />
+<h2 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a>.</h2>
 
-Notes: (updated 0954 12/09)<br />
-  joint 2 limit = + 2.4, -2,6 ,,,,,, but this will make the robot go into the ground so we have to find angle at which the robot hits the wall<br />
-  joint 3 limit is +- 2.6<br />
-  joint 4 limit is +- 1.8<br />
-  
-  
-"aruco detect" package <br />
-- then change topic in the config
+<p align="center">
+  <a href="#Overview">Overview</a> •
+  <a href="#how-to-use">How To Use</a> •
+  <a href="#download">Download</a> •
+  <a href="#credits">Credits</a> •
+  <a href="#license">License</a>
+</p>
+
+## Overview
+
