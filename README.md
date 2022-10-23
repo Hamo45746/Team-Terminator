@@ -1,9 +1,11 @@
 # METR4202 Team Project - Group 12
-[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
+<p align="centre">
+  <a href=[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)>
+  <a href=[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)>
+  <a href=[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)>
+</p>
 
-<h2 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h2>
+<h3 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h3>
 
 <p align="center">
   <a href="#Overview">Overview</a> •
@@ -19,7 +21,7 @@ A controller designed for the 4R robot shown.
 
 //put gif here
 
-The robot has the task of finding, grabbing and shifting aruco tagged cubes using a camera, from a rotating plate to colour designated drop off points.  
+The robot has the task of finding, grabbing and shifting aruco tagged cubes using a camera, from a rotating plate to a colour designated drop off points.  
 
 ## How To Use
 
