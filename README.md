@@ -12,7 +12,7 @@
   <a href="#how-to-use">How To Use</a> •
   <a href="#download">Download</a> •
   <a href="#credits">Credits</a> •
-  <a href="#license">License</a>
+  <a href="#version-control">Version Control</a>
 </p>
 
 ## Overview
@@ -25,11 +25,22 @@ The robot has the task of finding, grabbing and shifting aruco tagged cubes usin
 
 ## How To Use
 
-To clone and run this project, you will need [Ubuntu v20.04](https://releases.ubuntu.com/focal/) and [ROS](http://wiki.ros.org/noetic/Installation/Ubuntu).
+To clone and run this project, you will need [Ubuntu MATE v20.04](https://ubuntu-mate.org/blog/ubuntu-mate-focal-fossa-release-notes/) and [ROS](http://wiki.ros.org/noetic/Installation/Ubuntu).
+
+Once ROS is installed, in the Ubuntu terminal the controller can be launched using the command:
+
+```bash
+roslaunch tbd
+```
 
 ## Download
 To download the repo use the following:
 
 ```bash
-$ git clone https://github.com/Hamo45746/Team-Terminator
+git clone https://github.com/Hamo45746/Team-Terminator
 ```
+# Credits
+
+# Version Control
+
+Though we later realised it is probably bad practice, different Github branches were made and dated with the current progress at that time, to demonstrate the development of the project.
