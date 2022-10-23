@@ -1,0 +1,22 @@
+<launch>
+    <node name="tag_selector" pkg="team12" type="tag_selector.py" />
+    <node name="dynamixel_interface_controller_node" pkg="dynamixel_interface" type="dynamixel_interface_controller_node" >
+		<rosparam command="load" file="$(find dynamixel_interface)/config/controller_config.yaml" />
+	</node>
+    
+    <node name="joint_publisher_throw" pkg="team12" type="joint_publisher_throw.py"/>
+    <node name="gripper_publisher_throw" pkg="team12" type="gripper_publisher_throw.py" />
+    <node name="position_confirmation_throw" pkg="team12" type="position_confirmation_throw.py"/>
+
+    <node name="movement_checker" pkg="team12" type="movement_checker.py" />
+    <node name="colour_detect" pkg="team12" type="colour_detect.py"  />
+
+    <include file="$(find ximea_ros)/launch/ximea_aruco.launch"/>
+
+    <node name="ximea_demo" pkg="ximea_ros" type="ximea_demo" />
+    <node name="ximea_color" pkg="ximea_color" type="example_camera.py" />
+
+</launch>
+
+
+
