@@ -1,9 +1,9 @@
 # METR4202 Team Project - Group 12
   
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/for-robots.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
   
 
 <h3 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h3>
@@ -53,24 +53,28 @@ Team members
 Code References
 
 1. 
+
    * Author: [UQ METR4202 Staff](https://github.com/UQ-METR4202)
    * Title: Dynamixel Interface
    * Type: source code
    * [Web Address](https://github.com/UQ-METR4202/dynamixel_interface)
 
 2.  
+
    * Author: [UQ METR4202 Staff](https://github.com/UQ-METR4202)
    * Title: METR4202 Ximea Camera Setup
    * Type: tutorial/source code
    * [Web Address](https://github.com/UQ-METR4202/metr4202_ximea_ros)
 
 3. 
+
    * Author: [Miguel Valencia](https://github.com/miggyval)
    * Title: METR4202 Ximea Camera Setup
    * Type: tutorial/source code
    * [Web Address](https://github.com/miggyval/metr4202_ximea_tutorial)
 
 4.  
+
    * Author: [WaveLab](https://github.com/wavelab)
    * Title: Ximea_ros_cam
    * Type: source code
