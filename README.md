@@ -70,7 +70,7 @@ Code References
    * Type: tutorial/source code
    * [Web Address](https://github.com/miggyval/metr4202_ximea_tutorial)
 
-4. 
+4.  
    * Author: [WaveLab](https://github.com/wavelab)
    * Title: Ximea_ros_cam
    * Type: source code
