@@ -3,7 +3,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 
-<h2 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a>.</h2>
+<h2 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h2>
 
 <p align="center">
   <a href="#Overview">Overview</a> •
@@ -15,3 +15,12 @@
 
 ## Overview
 
+A controller designed for the 4R robot shown. 
+
+//put gif here
+
+The robot has the task of finding, grabbing and shifting aruco tagged cubes using a camera, from a rotating plate to colour designated drop off points.  
+
+## How To Use
+
+To clone and run this project, you will need [Ubuntu v20.04](https://releases.ubuntu.com/focal/) and [ROS](http://wiki.ros.org/noetic/Installation/Ubuntu).
