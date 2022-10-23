@@ -1,11 +1,10 @@
 # METR4202 Team Project - Group 12
-<p align="centre">
   
-  <a href="">[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)</a>
-  <a href="">[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)</a>
-  <a href="">[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)</a>
+<div align="centre">[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)</div>
+<div align="centre">[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)</div>
+<div align="centre">[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)</div>
   
-</p>
+
 
 <h3 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h3>
 
