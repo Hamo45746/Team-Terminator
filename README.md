@@ -46,13 +46,13 @@ roslaunch team12 robot_arm.launch
 
 ## Credits
 
-Team members
+Team members:
 [Hamish Macintosh](https://github.com/Hamo45746)
 [Samuel Noffke](https://github.com/noff04)
 [Rhys Mead](https://github.com/RhysM23)
 [Sanjeet Bharaj](https://github.com/sanjeetsb)
 
-Code References
+Acknoledgements:
 
 1. 
 
