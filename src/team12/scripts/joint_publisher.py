@@ -12,25 +12,39 @@ import numpy as np
 import math as m
 
 def desired_locations():
+    '''
+    Inputs: N/A
+    Returns: list[desired_end_angle, desireed_z, desired_distance]
+    - desired_end_angle: Desired end effector angle of the robot
+    - desired_z: the desired height of the end effector angle
+    - desired_distance: the desired distance of the end effector from the \
+        robot origin
+    '''
+
     deg_0_threshhold = 0.19
     deg_45_thresh = 0.16
-    desired_distance = calculate_distance(desired_position) + 0.015 ###########
+    desired_distance = calculate_distance(desired_position) ###########
     
+    # Calculate the parameters to be returned based on thresholds
     if desired_distance < deg_45_thresh:
-        desired_end_angle = np.deg2rad(-70)
-        desired_z = -0.02 # final values for demo z = -0.01 ####################
+        desired_end_angle = np.deg2rad(-65)
+        desired_z = -0.01 # final values for demo z = -0.01 ####################
     elif (deg_45_thresh <= desired_distance <= deg_0_threshhold):
-        desired_end_angle = np.deg2rad(-70)
-        desired_z = 0.02 # final values for demo z = -0.01 ####################
+        desired_end_angle = np.deg2rad(-65)
+        desired_z = -0.01 # final values for demo z = -0.01 ###################
     elif (desired_distance > deg_0_threshhold):
         desired_end_angle = np.deg2rad(-5)
-        desired_z = 0.03 # final values for demo z = 0.02 ######################
+        desired_z = 0.02# final values for demo z = 0.02 ######################
     elif (desired_distance > deg_0_threshhold+0.03):
         desired_end_angle = np.deg2rad(-5)
-        desired_z = 0.08 # final values for demo z = 0.03 ######################
+        desired_z = 0.045 # final values for demo z = 0.03 ####################
     return [desired_end_angle, desired_z, desired_distance]
 
 def colour_checker():
+    '''
+    inputs: colour (string): the string received from the topic 'colour'
+    returns: theta1(float): the requiured theta1 angle for the recieved colour
+    '''
     if colour == "B":
         return -0.2
     elif colour == "R":
@@ -44,18 +58,38 @@ def colour_checker():
         return 0
 
 def store_position(i):
+    '''
+    Stores the required end effector position
+    inputs: i (Pose), required pose for end effector
+    outputs: N/A
+    '''
     global desired_position
     desired_position = i
 
 def store_colour(i):
+    '''
+    Stores the colour detected by the camera
+    inputs: i (String), the detected colour
+    outputs: N/A
+    '''
     global colour
     colour = i.data
 
 def store_state(i):
+    '''
+    Stores the current state
+    inputs: i (Int8), the current state
+    outputs: N/A
+    '''
     global state
     state = i.data
 
 def store_valid_cube(i):
+    '''
+    Stores the variable determining if the cube is a valid pickup-position
+    inputs: i (Int), if the current cube is a valid pickup.
+    outputs: N/A
+    '''
     global is_valid_cube
     is_valid_cube = i.data
 
