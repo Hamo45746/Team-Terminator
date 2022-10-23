@@ -128,7 +128,7 @@ def inverse_kinematics(pose):
         deg_45_thresh = 0.16
 
         min_x = 0.08
-        desired_distance = np.sqrt(desired_x**2 + desired_y**2) + 0.015
+        desired_distance = np.sqrt(desired_x**2 + desired_y**2) # + 0.015 - this was done for calibration on rig ########
         if desired_distance < deg_45_thresh:
             desired_end_angle = -90 * (np.pi/180)
             # for the actual rig: desired_z=-0.01
