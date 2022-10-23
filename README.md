@@ -1,12 +1,11 @@
 # METR4202 Team Project - Group 12
   
-<div align="centre">[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)</div>
-<div align="centre">[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)</div>
-<div align="centre">[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)</div>
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-electricity.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
   
 
-
-<h3 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h3>
+<h2 align="center">A robot controller built for the METR4202 Robotics & Automation 2022 Semester 2 Team Project 🤖</a></h2>
 
 <p align="center">
   <a href="#Overview">Overview</a> •
@@ -27,3 +26,10 @@ The robot has the task of finding, grabbing and shifting aruco tagged cubes usin
 ## How To Use
 
 To clone and run this project, you will need [Ubuntu v20.04](https://releases.ubuntu.com/focal/) and [ROS](http://wiki.ros.org/noetic/Installation/Ubuntu).
+
+## Download
+To download the repo use the following:
+
+```bash
+$ git clone https://github.com/Hamo45746/Team-Terminator
+```
