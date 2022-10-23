@@ -10,6 +10,13 @@ import rospy
 old_pos_dict = {}
 
 def determine_if_moving(i):
+    '''
+    Callback function for vertex_sub that subscribes to fiducial_vertices. 
+    Determines if the position of aruco tag vertices has changed by greather than
+    1%. Publishes 0 if the tag is not moving and 1 if it is moving.
+    inputs: i (FiducialArray, 2D array of floats)
+    outputs: 
+    '''
     global vertex
     vertex = i
 
