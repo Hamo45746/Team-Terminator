@@ -20,7 +20,9 @@
 
 A controller designed for the 4R robot shown. 
 
-![](20221023_151510_1.gif)
+<p align="center">
+  <img src="20221023_151510_1.gif" alt="animated" />
+</p>
 
 The robot has the task of finding, grabbing and shifting aruco tagged cubes using a camera, from a rotating plate to a colour designated drop off points.  
 
