@@ -38,9 +38,11 @@ git clone https://github.com/Hamo45746/Team-Terminator
 
 To clone and run this project, you will need [Ubuntu MATE v20.04](https://ubuntu-mate.org/blog/ubuntu-mate-focal-fossa-release-notes/) and [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu).
 
-Once ROS is installed, in the Ubuntu terminal the controller can be launched using the command:
+Once ROS is installed, in the Ubuntu terminal the controller can be launched by running the following commands (individually):
 
 ```bash
+source /opt/ros/noetic/setup.bash # once per terminal
+source ./devel/setup.bash
 roslaunch team12 robot_arm.launch
 ```
 
@@ -50,7 +52,7 @@ Once the first camera image window appears, press spacebar to make it colour, th
 
 Team members:
 [Hamish Macintosh](https://github.com/Hamo45746)
-[Samuel Noffke](https://github.com/noff04)
+[Samual Noffke](https://github.com/noff04)
 [Rhys Mead](https://github.com/RhysM23)
 [Sanjeet Bharaj](https://github.com/sanjeetsb)
 
