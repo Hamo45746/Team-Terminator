@@ -187,7 +187,7 @@ def inverse_kinematics(desired_end_angle,pose,desired_z,desired_distance, \
     theta2 = m.atan2(desired_elevation_actual,desired_distance_actual) - \
         np.arctan2(L2*np.sin(theta3),L2 + L3*np.cos(theta3))
     
-    # Claaculate theta4 based on other joint angles
+    # Calculate theta4 based on other joint angles
     theta4 =  desired_end_angle - theta2 - theta3
 
     # Shift theta2 to be measured from the vertical instead of the horizontal
