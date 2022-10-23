@@ -46,8 +46,6 @@ def trans(t: Transform):
 
     # Assuming exactly zero rotation between aruco tag and robot base (will need to be very precise or
 
-    # change this, as it will fuck us up)
-
 
 
     # Multiply transformation matrix by translation from aruco tag to robot base
@@ -55,8 +53,9 @@ def trans(t: Transform):
     #T_A2R = np.array([1,0,0,x_dist],[0,1,0,y_dist],[0,0,1,z_dist],[0,0,0,1]) 
     #return np.matmul(T_C2A, T_A2R)
 
-
-
+def store_is_moving(i):
+    global is_moving
+    is_moving = i.data
 
 def store_state(i):
     global state
@@ -69,7 +68,7 @@ def store_vertex(i):
 # id for the camera
 #info_camera.header.frame_id = std::string("ximea_") + serial;
 
-
+previous_pose = Pose()
 
 loop_count = 0
 def T_C2R(p):
@@ -80,21 +79,19 @@ def T_C2R(p):
     global listener
     global sub_transform
     global tfBuffer
-    global msg,state,vertex,pub_ignore,camera_to_robot
+    global msg,state,vertex,pub_ignore,camera_to_robot,previous_pose,state_pub,ismoving_pub,pub_valid_cube,current_pose
     print('converter outside of if statements: state=',state)
     
     #print('hi1')
     transform_array = []
     k=0
-
+    
     #camera_to_robot = np.array([[],[],[],[]])
     if (state==0):
         print('in state 0 converter loop','\n\n\n\n')
-        
-       
-
     elif (p.transforms != []) and (state==2):
         print('in converter loop')
+        print(p.transforms)
         lowest_theta_set = 10000
         lowest_theta = lowest_theta_set
         for i,j in enumerate(p.transforms):
@@ -148,38 +145,117 @@ def T_C2R(p):
                 desired_y = robot_to_tag_1[1][3]
                 desired_x = robot_to_tag_1[0][3]
                 theta1 = np.arctan(desired_y/desired_x)
+                
+                #new code
+                vertex_0 = [0,0]
+                vertex_1 = [0,0]
+                vertex_2 = [0,0]
+                vertex_3 = [0,0]
+                vertex_closest = [0,0]
+                vertex_right = [0,0]
 
-                x0 = vertex.fiducials[0].x0
-                y0 = vertex.fiducials[0].y0
-                x1 = vertex.fiducials[0].x1
-                y1 = vertex.fiducials[0].y1
-                x2 = vertex.fiducials[0].x2
-                y2 = vertex.fiducials[0].y2
+                vertex_0[0] = vertex.fiducials[0].x0
+                vertex_0[1] = vertex.fiducials[0].y0
+                vertex_1[0] = vertex.fiducials[0].x1
+                vertex_1[1] = vertex.fiducials[0].y1
+                vertex_2[0] = vertex.fiducials[0].x2
+                vertex_2[1] = vertex.fiducials[0].y2
+                vertex_3[0] = vertex.fiducials[0].x3
+                vertex_3[1] = vertex.fiducials[0].y3
 
-                block_theta = min(abs(np.arctan((y1-y0) / (x1-x0))),abs(np.arctan((y2-y1) / (x2-x1))))
-                relative_theta = abs(theta1) - block_theta
+                vertex_closest[1] = min(vertex_0[1],vertex_1[1],vertex_2[1],vertex_3[1])
+                if(vertex_closest[1] == vertex_0[1]):
+                    vertex_closest[0] = vertex_0[0]
+                elif(vertex_closest[1] == vertex_1[1]):
+                    vertex_closest[0] = vertex_1[0]
+                elif(vertex_closest[1] == vertex_2[1]):
+                    vertex_closest[0] = vertex_2[0]
+                elif(vertex_closest[1] == vertex_3[1]):
+                    vertex_closest[0] = vertex_3[0]
+
+                vertex_right[0] = min(vertex_0[0],vertex_1[0],vertex_2[0],vertex_3[0])
+                if(vertex_right[0] == vertex_0[0]):
+                    vertex_right[1] = vertex_0[1]
+                elif(vertex_right[0] == vertex_1[0]):
+                    vertex_right[1] = vertex_1[1]
+                elif(vertex_right[0] == vertex_2[0]):
+                    vertex_right[1] = vertex_2[1]
+                elif(vertex_right[0] == vertex_3[0]):
+                    vertex_right[1] = vertex_3[1]               
+
+                block_theta = abs(np.arctan((vertex_right[1]-vertex_closest[1]) / (vertex_right[0]-vertex_closest[0])))
+
+                # if(theta1 < 0):
+                #     block_theta = np.deg2rad(90) - block_theta
+
+                #new code finish
+
+                #old code start
+                # x0 = vertex.fiducials[0].x0
+                # y0 = vertex.fiducials[0].y0
+                # x1 = vertex.fiducials[0].x1
+                # y1 = vertex.fiducials[0].y1
+                # x2 = vertex.fiducials[0].x2
+                # y2 = vertex.fiducials[0].y2
+
+                # block_theta = min(abs(np.arctan((y1-y0) / (x1-x0))),abs(np.arctan((y2-y1) / (x2-x1))))
+                #old code finish
+                
+                if(theta1 > 0):
+                    relative_theta = block_theta - abs(theta1)
+                else:
+                    relative_theta = np.deg2rad(90) - block_theta - abs(theta1)
+
+                # if(abs(relative_theta) > np.deg2rad(45)):
+                #     if(relative_theta) < 0:
+                #         relative_theta += np.deg2rad(45)
+                #     else:
+                #         relative_theta -= np.deg2rad(45)
+
+                print("theta1: ",np.rad2deg(theta1))
+                print("relative_theta: ",np.rad2deg(relative_theta))
+                print("block_theta: ",np.rad2deg(block_theta))
+
                 print('in loop here')
-                print('angles,theta1,block',theta1,block_theta)
-                if (abs(relative_theta) < lowest_theta) and (abs(relative_theta) < (20*(np.pi/180))):
+                print('angles,theta1,block',theta1,block_theta,relative_theta)
+                angle_to_pick_up = 15
+                if (abs(relative_theta) < lowest_theta) and ((abs(relative_theta) < np.rad2deg(angle_to_pick_up)) or (abs(relative_theta) > np.rad2deg(90-angle_to_pick_up))):
                     lowest_theta = abs(relative_theta)
                     lowest_theta_transform = robot_to_tag_1
+                
                 # need to see if the angle is greater than a threshold #################################################################################
         print('\n\n\n\n',lowest_theta,'\n\n\n\n')
         
-        if lowest_theta != lowest_theta_set:
-            msg = Pose()
-            msg.position.x = lowest_theta_transform[0][3]
-            msg.position.y =  lowest_theta_transform[1][3]
-            msg.position.z = lowest_theta_transform[2][3]
-            
-            i=0
-            while i < 3:
-                pub.publish(msg)
-                i+=1
+        if is_moving == 1:
+            pub_valid_cube.publish(0)
+            print("in is moving if")
+        else:
+            if lowest_theta != lowest_theta_set:
+                current_pose = Pose()
+                current_pose.position.x = lowest_theta_transform[0][3]
+                current_pose.position.y =  lowest_theta_transform[1][3]
+                current_pose.position.z = lowest_theta_transform[2][3]
+                print('pose',current_pose,previous_pose)
+                if previous_pose != current_pose:
+                    i=0
+                    while i < 3:
+                        pub_valid_cube.publish(1)
+                        #pub.publish(current_pose)
+                        state_pub.publish(7)
+                        i+=1
+                else:
+                    print('in second else')
+                    pub_valid_cube.publish(0)
+                    
+            else:
+                print('in else')
+                pub_valid_cube.publish(0)
+            previous_pose = msg
 
+    elif state==7:
+        pub.publish(current_pose)
 
     elif state==4:
-        
         transform_array.append(np.array([
             [0 ,1 , 0, 0.0],
             [1 ,0 , 0, -0.03],
@@ -213,11 +289,8 @@ def T_C2R(p):
         pub.publish(msg)
     else:
         print('empty  transform, not in state 0, 2, or 4')
-    #    msg = Pose()
-    #    msg.position.x = 0
-    #    msg.position.y = 0
-    #    msg.position.z = 0.2
-    #    pub.publish(msg)
+        pub_valid_cube.publish(0)
+
     camera_to_tag_1 = np.zeros((4,4))
 
     #this is how to do it with tfmessage
@@ -245,7 +318,7 @@ def T_C2R(p):
 def main():
     global pub
     global listener
-    global sub_transform,tfBuffer,pub_ignore
+    global sub_transform,tfBuffer,pub_ignore,state_pub,pub_valid_cube
     
     #tfBuffer = tf2_ros.Buffer()
     #listener = tf2_ros.TransformListener(tfBuffer)
@@ -259,6 +332,21 @@ def main():
         msg.Int16, # Message type
         store_state # Callback function (required)
     )
+
+    pub_valid_cube = rospy.Publisher("is_valid_cube", msg.Int8, queue_size=10)
+
+    state_pub= rospy.Publisher(
+        'state', # Topic name
+        msg.Int16, # Message type
+        queue_size=10 # Topic size (optional)
+    )
+
+    sub = rospy.Subscriber(
+        'is_moving', # Topic name
+        msg.Int8, # Message type
+        store_is_moving # Callback function (required)
+    )
+
     vertex_sub = rospy.Subscriber("fiducial_vertices", FiducialArray , store_vertex)
     #sub_point = rospy.Subscriber('tf',TFMessage, T_C2R)#replace placeholders with actual topics
     sub_point = rospy.Subscriber('fiducial_transforms',FiducialTransformArray, T_C2R)#replace placeholders with actual topics

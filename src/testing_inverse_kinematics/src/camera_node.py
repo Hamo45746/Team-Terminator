@@ -83,12 +83,19 @@ def publish_colour(i):
             rgbcolour = ""
 
             colour = ColorRGBA()
-            colour.r = bgr[2]
-            colour.g = bgr[1]
-            colour.b = bgr[0]
+            r = bgr[2]
+            g = bgr[1]
+            b = bgr[0]
+            # normalise the rgb values
+            norm_r = r / max(r,b,g)
+            norm_g = g / max(r,b,g)
+            norm_b = b / max(r,b,g)
+            print(norm_r)
+            print(norm_g)
+            print(norm_b)
 
             # ologic f0to detect colour of the block at the giuven pixel
-
+            '''
             if(colour.r > 150 and colour.g > 150 and colour.b < 150):
                 rgbcolour =  "Y"
             elif(colour.r > 150 and colour.g < 150 and colour.b < 150):
@@ -97,6 +104,18 @@ def publish_colour(i):
                 rgbcolour = "G"
             elif(colour.r < 100 and colour.g > 100 and colour.b > 100):
                 rgbcolour = "B"
+            colour_pub.publish(rgbcolour)
+            #'''
+            # using normalised values
+            if(norm_r >0.8 and norm_g >0.8 and norm_b <0.4):
+                rgbcolour = "Y"
+            elif (norm_r == 1 and norm_g > 0.2 and norm_b < 0.3):
+                rgbcolour =  "R"
+            elif(norm_r >0.38 and norm_g ==1 and norm_b < 0.4):
+                rgbcolour = "G"
+            elif(norm_r <0.45 and norm_g >0.6 and norm_b == 1):
+                rgbcolour = "B"
+            
             colour_pub.publish(rgbcolour)
         except:
             pass

@@ -51,7 +51,8 @@ def move_gripper(i):
 
     elif i.data == (1):
         rpi.set_servo_pulsewidth(18,open)
-        
+
+
     #1000 is the closed position
     #1500 is the grip box position
     #2000 is the open position

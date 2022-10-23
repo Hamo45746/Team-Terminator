@@ -22,8 +22,11 @@ L3 = 0.095
 L4 = 0.07
 
 
-
 joint_state = [1000,1000,1000,1000]
+
+def store_is_valid(i):
+    global is_valid_cube
+    is_valid_cube = i.data
 
 def store_is_moving(i):
     global is_moving
@@ -33,7 +36,6 @@ def store_grab(pose: JointState):
     global grab_state
     grab_state= pose
     
-
 def store_colour_state(pose: JointState):
     global colour_state
     colour_state= pose
@@ -42,7 +44,6 @@ def store_drop(pose: JointState):
     global drop_state
     if abs(pose.position[0]) > 0.1:
         drop_state= pose     
-
 
 def store_colour(i):
     global colour
@@ -84,20 +85,34 @@ def end_pos_check (des_thetaL, act_thetaL, cfl, cfh):
         print('false')
         return check
 
-    
 
 def verify(joint_state: JointState): # passes in the desired state
     print("verify")
 
-    global grab_state, colour_state,drop_state, state,pub_close,is_moving
+    global grab_state, colour_state,drop_state, state,pub_close,is_valid_cube,is_moving
    
     if len(joint_state.position) == 4:
         
         #assign variables
         act_thetaL = [joint_state.position[3],joint_state.position[2],joint_state.position[1],joint_state.position[0]]
         #desired theta list [ theta1, theta2, theta3, theta4]
-        if state == 0:
 
+        if state == -1:
+            cfl = 0.9 #close factor low
+            cfh = 1.3 #close factor high
+            theta1 = 0
+            theta2 = -0.65475068
+            theta3 = -1.1464
+            theta4 = 0.87010
+            des_thetaL = [ theta1, theta2, theta3, theta4]
+            correct_pos = end_pos_check(des_thetaL, act_thetaL, cfl, cfh)
+            if correct_pos == True:
+                i=0
+                while i<2:
+                    pub_state.publish(6)
+                    i+=1
+
+        elif state == 0:
             cfl = 0.9 #close factor low
             cfh = 1.1 #close factor high
             des_thetaL = [0,0,0,0] #desired theta list [ theta1, theta2, theta3, theta4]
@@ -118,9 +133,9 @@ def verify(joint_state: JointState): # passes in the desired state
                         pub_state.publish(2)
                         i+=1
 
-        elif state == 2:
+        elif state == 7:
             cfl = 0.96 #close factor low
-            cfh = 1.3#close factor high
+            cfh = 1.5#close factor high
             des_thetaL = [grab_state.position[0], grab_state.position[1],grab_state.position[2],grab_state.position[3]]
             #desired theta list [ theta1, theta2, theta3, theta4]
 
@@ -219,10 +234,16 @@ def main():
     )
 
     sub = rospy.Subscriber(
+        'is_valid_cube', # Topic name
+        msg.Int8, # Message type
+        store_is_valid # Callback function (required)
+    )
+    sub = rospy.Subscriber(
         'is_moving', # Topic name
         msg.Int8, # Message type
         store_is_moving # Callback function (required)
     )
+
 
     # Initialise node with any node name
     rospy.init_node('checker')
@@ -233,4 +254,5 @@ def main():
 
 
 if __name__ == '__main__':
+    is_valid_cube = 1
     main()
