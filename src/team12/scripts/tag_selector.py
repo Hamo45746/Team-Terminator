@@ -10,20 +10,40 @@ from geometry_msgs.msg import Pose
 from fiducial_msgs.msg import FiducialArray
 
 def store_is_moving(i):
+    '''
+    Stores whether an aruco tag is moving or not
+    inputs: i () 1 or 0, moving or not moving
+    outputs: N/A
+    '''
     global is_moving
     is_moving = i.data
 
 def store_state(i):
+    '''
+    Stores the current state of the robot
+    inputs: i (int32) integer number of the state
+    outputs: N/A
+    '''
     global state
     state = i.data
 
 def store_vertex(i):
+    '''
+    Stores a vertex posiiton of an aruco tag
+    inputs: i () 
+    outputs: N/A
+    '''
     global vertex
     vertex = i
 
 previous_pose = Pose()
 
 def create_vertex_list():
+    '''
+    Creates a list of tuples of the x and y coordinate of the corners of an aruco tag
+    input: N/A
+    output: vertex_list (2D array of floats)
+    '''
     vertex_list = [[0,0],[0,0],[0,0],[0,0]]
     vertex_list[0][0] = vertex.fiducials[0].x0 #x0 position
     vertex_list[0][1] = vertex.fiducials[0].y0 #y0 position
@@ -36,6 +56,11 @@ def create_vertex_list():
     return vertex_list
 
 def get_closest_vertex(vertex_list):
+    '''
+    Finds the aruco tag vertex closest to the robot
+    inputs: vertex_list (2D array of floats)
+    outputs: vertex_closest (2D array of floats)
+    '''
     print("vertex_list:", vertex_list)
     vertex_closest = [0,0]
     vertex_closest[1] = min(vertex_list[0][1], vertex_list[1][1], \
@@ -51,6 +76,11 @@ def get_closest_vertex(vertex_list):
     return vertex_closest
 
 def get_right_vertex(vertex_list):
+    '''
+    Finds the vertex of an aruco tag furthest to the right
+    input: vertex_list (2D array of floats)
+    output: vertex_right (2D array of floats)
+    '''
     vertex_right = [0,0]
     vertex_right[0] = min(vertex_list[0][0],vertex_list[1][0],\
             vertex_list[2][0],vertex_list[3][0])
@@ -66,6 +96,16 @@ def get_right_vertex(vertex_list):
 
 
 def T_C2R(p):
+    '''
+    Callback function for the subscriber to fiducial_transforms.
+    Transforms the fiducial transform in camera frame into the robot frame.
+    Performs other operations based on state of the robot. In state 2 will publish desired x,y
+    coordinates of end effector in robot frame to reach the optimal aruco tag. 
+    In state 7 publishes the current robot pose. In state 4 publishes desired pose for
+    holding cube up to camera. 
+    inputs: p (FiducialTransformArray)
+    outputs: N/A
+    '''
     global camera_to_robot_base 
     global pub
     global sub_transform
