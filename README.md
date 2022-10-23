@@ -51,21 +51,25 @@ Team members
 [Sanjeet Bharaj](https://github.com/sanjeetsb)
 
 Code References
+
 1. 
    * Author: [UQ METR4202 Staff](https://github.com/UQ-METR4202)
    * Title: Dynamixel Interface
    * Type: source code
    * [Web Address](https://github.com/UQ-METR4202/dynamixel_interface)
+
 2.  
    * Author: [UQ METR4202 Staff](https://github.com/UQ-METR4202)
    * Title: METR4202 Ximea Camera Setup
    * Type: tutorial/source code
    * [Web Address](https://github.com/UQ-METR4202/metr4202_ximea_ros)
+
 3. 
    * Author: [Miguel Valencia](https://github.com/miggyval)
    * Title: METR4202 Ximea Camera Setup
    * Type: tutorial/source code
    * [Web Address](https://github.com/miggyval/metr4202_ximea_tutorial)
+
 4. 
    * Author: [WaveLab](https://github.com/wavelab)
    * Title: Ximea_ros_cam
