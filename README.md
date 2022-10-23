@@ -42,11 +42,15 @@ Once ROS is installed, in the Ubuntu terminal the controller can be launched usi
 roslaunch tbd
 ```
 
-# Credits
+## Credits
 
 Team members:
 [Hamish Macintosh](https://github.com/Hamo45746)
+[Samuel Noffke](https://github.com/noff04)
+[Rhys Mead](https://github.com/RhysM23)
+[Sanjeet Bharaj](https://github.com/sanjeetsb)
 
-# Version Control
+
+## Version Control
 
 Though we later realised it is probably bad practice, different [Github](https://github.com/Hamo45746/Team-Terminator) branches were made and dated with the current progress at that time, to demonstrate the development of the project.
