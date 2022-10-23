@@ -44,6 +44,8 @@ Once ROS is installed, in the Ubuntu terminal the controller can be launched usi
 roslaunch team12 robot_arm.launch
 ```
 
+Once the first camera image window appears, press spacebar to make it colour. 
+
 ## Credits
 
 Team members:
@@ -52,7 +54,7 @@ Team members:
 [Rhys Mead](https://github.com/RhysM23)
 [Sanjeet Bharaj](https://github.com/sanjeetsb)
 
-Acknoledgements:
+Acknowledgements:
 
 1. 
 
