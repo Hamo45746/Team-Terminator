@@ -38,12 +38,19 @@ git clone https://github.com/Hamo45746/Team-Terminator
 
 To clone and run this project, you will need [Ubuntu MATE v20.04](https://ubuntu-mate.org/blog/ubuntu-mate-focal-fossa-release-notes/) and [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu).
 
+To install and setup the project dependancies follow the directions in [this setup file](https://github.com/UQ-METR4202/METR4202_S2-2022_Resources/blob/main/RPi4_Setup.md) 
+
 Once ROS is installed, in the Ubuntu terminal the controller can be launched by running the following commands (individually):
 
 ```bash
 source /opt/ros/noetic/setup.bash # once per terminal
 source ./devel/setup.bash
 roslaunch team12 robot_arm.launch
+```
+Then, in the workspace run the terminal command:
+
+```bash
+catkin build
 ```
 
 Once the first camera image window appears, press spacebar to make it colour, then the controller will run.
@@ -86,7 +93,12 @@ Acknowledgements:
    * Type: source code
    * [Web Address](https://github.com/wavelab/ximea_ros_cam.git)
 
+5. 
 
+   * Author: [UQ METR4202 Staff](https://github.com/UQ-METR4202)
+   * Title: METR4202_S2-2022_Resources
+   * Type: tutorial
+   *[web address](https://github.com/UQ-METR4202/METR4202_S2-2022_Resources/blob/main/RPi4_Setup.md)
 
 ## Version Control
 
