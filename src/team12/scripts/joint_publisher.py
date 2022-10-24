@@ -34,7 +34,7 @@ def desired_locations():
         desired_z = -0.01 # final values for demo z = -0.01 ###################
     elif (desired_distance > deg_0_threshhold):
         desired_end_angle = np.deg2rad(-5)
-        desired_z = 0.02# final values for demo z = 0.02 ######################
+        desired_z = 0.03# final values for demo z = 0.02 ######################
     elif (desired_distance > deg_0_threshhold+0.03):
         desired_end_angle = np.deg2rad(-5)
         desired_z = 0.045 # final values for demo z = 0.03 ####################
@@ -187,7 +187,7 @@ def inverse_kinematics(desired_end_angle,pose,desired_z,desired_distance, \
     theta2 = m.atan2(desired_elevation_actual,desired_distance_actual) - \
         np.arctan2(L2*np.sin(theta3),L2 + L3*np.cos(theta3))
     
-    # Calculate theta4 based on other joint angles
+    # Claaculate theta4 based on other joint angles
     theta4 =  desired_end_angle - theta2 - theta3
 
     # Shift theta2 to be measured from the vertical instead of the horizontal
@@ -256,13 +256,14 @@ def joint_angle_publisher(joint_states):
 
 if __name__ == '__main__':
     global pub_colour_state,pub_joint,pub_drop_state,pub_grab_state, \
-        pub_wait_state,pub_state,pub_inter_state
+        pub_wait_state,pub_state,pub_inter_state,state
 
     '''
     The following defines thepublisherss and subscribers for this script
     Publishers of the format: topic name, type, queue_size
     Subscribers of the form: topic name, type, callback function
     '''
+    state=0
     pub_joint = rospy.Publisher('desired_joint_states', JointState, \
         queue_size=50)
 

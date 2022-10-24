@@ -61,7 +61,6 @@ def get_closest_vertex(vertex_list):
     inputs: vertex_list (2D array of floats)
     outputs: vertex_closest (2D array of floats)
     '''
-    print("vertex_list:", vertex_list)
     vertex_closest = [0,0]
     vertex_closest[1] = min(vertex_list[0][1], vertex_list[1][1], \
             vertex_list[2][1], vertex_list[3][1])
@@ -185,6 +184,7 @@ def T_C2R(p):
             previous_pose = msg
     elif state==7:
         pub.publish(current_pose)
+        
     elif state==4:
         transform_array.append(np.array([[0, 1, 0, 0.0],
                                          [1, 0, 0, -0.03],
@@ -209,16 +209,17 @@ def T_C2R(p):
         msg.position.y =  robot_to_tag_1[1][3]
         msg.position.z = robot_to_tag_1[2][3]
         pub.publish(msg)
+    
     else:
         pub_valid_cube.publish(0)
 
     camera_to_tag_1 = np.zeros((4,4))
-
+    
 if __name__=='__main__':
     global pub
     global listener
-    global sub_transform,tfBuffer,pub_ignore,state_pub,pub_valid_cube
-    
+    global sub_transform,tfBuffer,pub_ignore,state_pub,pub_valid_cube,state
+    state = 0
     #loop_count = 0
     sub_transform = np.array([[1,0,0,0],[0,1,0,-0.3],[0,0,1,0.5],[0,0,0,1]])
 

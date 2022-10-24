@@ -97,7 +97,6 @@ def end_pos_check (des_thetaL, act_thetaL, cfl, cfh):
     outputs: (boolean) True if actual angles are within threshold,
                 False if actual angles are outside threshold
     '''
-    
     des_thetaL = np.rad2deg(des_thetaL)    
     act_thetaL = np.rad2deg(act_thetaL)
     percent_dif_list = [0,0,0,0]
@@ -203,11 +202,8 @@ def verify(joint_state: JointState): # passes in the desired state
                 pub_state.publish(4)
 
 if __name__ == '__main__':
-    '''
-    
-    '''
-    global pub_state,pub_close
-    
+    global pub_state,pub_close,state
+    state = 0
     is_valid_cube = 1
     
     # Create publisher

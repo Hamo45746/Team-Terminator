@@ -23,8 +23,8 @@ def determine_if_moving(i):
     old_corners = [[0,0],[0,0],[0,0],[0,0]]
     if vertex.fiducials != []:
         for tag in vertex.fiducials:
-            lower_bound = 0.99
-            upper_bound = 1.01
+            lower_bound = 0.9925
+            upper_bound = 1.0075
 
             if tag.fiducial_id in old_pos_dict:
                 #returns [[old_x0,old_y0],[old_x1,old_y1],

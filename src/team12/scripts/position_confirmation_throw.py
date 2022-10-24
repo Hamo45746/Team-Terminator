@@ -9,40 +9,94 @@ import numpy as np
 joint_state = [1000,1000,1000,1000]
 
 def store_is_valid(i):
+    '''
+    Stores whether cube is in valid position to be grabbed. 
+    1 for valid position, 0 for invalid position.
+    inputs: i (int)
+    outputs: N/A
+    '''
     global is_valid_cube
     is_valid_cube = i.data
 
 def store_is_moving(i):
+    '''
+    Stores whether cube is moving or not.
+    1 for moving, 0 for stationary.
+    inputs: i (int)
+    outputs: N/A
+    '''
     global is_moving
     is_moving = i.data
 
 def store_grab(pose: JointState):
+    '''
+    Stores desired joint states at which to close gripper.
+    inputs: pose (JointState)
+    outputs: N/A
+    '''
     global grab_state
     grab_state= pose
     
 def store_inter_state(pose: JointState):
+    '''
+    Stores desired joint states to reach between grabbing the cube and
+    holding it up to the camera.
+    inputs: pose (JointState)
+    output: N/A
+    '''
     global inter_state
     inter_state = pose
 
 def store_colour_state(pose: JointState):
+    '''
+    Stores desired joint states to hold cube up to camera.
+    inputs: pose (JointState)
+    outputs: N/A
+    '''
     global colour_state
     colour_state= pose
 
 def store_drop(pose: JointState):
+    '''
+    Stores desired joint states to drop cube at, 
+    depending on the detected colour.
+    inputs: pose (JointState)
+    output: N/A
+    '''
     global drop_state
     if abs(pose.position[0]) > 0.1:
         drop_state= pose     
 
 def store_colour(i):
+    '''
+    Stores the colour of the targeted cube.
+    inputs: i (String, one of 'Y', 'G', 'R', 'B')
+    outputs: N/A
+    '''
     global colour
     colour = i.data
 
 def store_state(i):
+    '''
+    Stores the current state of the robot.
+    inputs: i (int)
+    outputs: N/A
+    '''
     global state
     state = i.data
  
 def end_pos_check (des_thetaL, act_thetaL, cfl, cfh):
-    
+    '''
+    Checks whether the actual joint angles are within a range of the 
+    desired joint angles.
+    inputs: 
+        - des_thetaL (list) desired joint angles
+        - act_thetaL (list) actual joint angles
+        - cfl (float) low percentage threshold of joint angles
+        - cfh (float) high percentage threshold of joint angles
+    outputs: (boolean) True if actual angles are within threshold,
+                False if actual angles are outside threshold
+    '''
     des_thetaL = np.rad2deg(des_thetaL)    
     act_thetaL = np.rad2deg(act_thetaL)
     percent_dif_list = [0,0,0,0]
@@ -69,6 +123,13 @@ def end_pos_check (des_thetaL, act_thetaL, cfl, cfh):
         return False
 
 def verify(joint_state: JointState): # passes in the desired state
+    '''
+    Checks if the actual joint states match the desired joint states,
+    depending on what position is wanted in each state. Publishes
+    the next state if the end position of current state is reached.
+    inputs: joint_state (JointState)
+    outputs: N/A
+    '''
     global grab_state, colour_state,drop_state, state,pub_close,is_valid_cube,\
         is_moving,inter_state
    
@@ -112,15 +173,14 @@ def verify(joint_state: JointState): # passes in the desired state
             if correct_pos == True:
                 pub_state.publish(3)
         elif state == 4:
-            cfl = 0.9 #close factor low
-            cfh = 1.5 #close factor high
-            des_thetaL = [0.03,-0.711,-0.4244,-1.279] 
+            cfl = 0.8 #close factor low
+            cfh = 1.3 #close factor high
+            des_thetaL = [0,0,0,0] 
             
             correct_pos = end_pos_check(des_thetaL, act_thetaL, cfl, cfh)
             if correct_pos == True:
                 i=0  
-                rospy.sleep(2)
-                pub_state.publish(5)
+                pub_state.publish(6)
         elif state == 5:
             cfl = 0.5 #close factor low
             cfh = 1.7 #close factor high
@@ -141,8 +201,9 @@ def verify(joint_state: JointState): # passes in the desired state
                 pub_state.publish(4)
 
 if __name__ == '__main__':
-    global pub_state,pub_close
+    global pub_state,pub_close,state
     
+    state = 0
     is_valid_cube = 1
     
     # Create publisher

@@ -12,6 +12,14 @@ import numpy as np
 import math as m
 
 def desired_locations():
+    '''
+    Inputs: N/A
+    Returns: list[desired_end_angle, desireed_z, desired_distance]
+    - desired_end_angle: Desired end effector angle of the robot
+    - desired_z: the desired height of the end effector angle
+    - desired_distance: the desired distance of the end effector from the \
+        robot origin
+    '''
     deg_0_threshhold = 0.19
     deg_45_thresh = 0.16
     desired_distance = calculate_distance(desired_position) #+ 0.015 ###########
@@ -31,6 +39,10 @@ def desired_locations():
     return [desired_end_angle, desired_z, desired_distance]
 
 def colour_checker():
+    '''
+    inputs: colour (string): the string received from the topic 'colour'
+    returns: theta1(float): the requiured theta1 angle for the recieved colour
+    '''
     if colour == "B":
         return -0.2
     elif colour == "R":
@@ -44,27 +56,55 @@ def colour_checker():
         return 0
 
 def store_position(i):
+    '''
+    Stores the required end effector position
+    inputs: i (Pose), required pose for end effector
+    outputs: N/A
+    '''
     global desired_position
     desired_position = i
 
 def store_colour(i):
+    '''
+    Stores the colour detected by the camera
+    inputs: i (String), the detected colour
+    outputs: N/A
+    '''
     global colour
     colour = i.data
 
 def store_state(i):
+    '''
+    Stores the current state
+    inputs: i (Int8), the current state
+    outputs: N/A
+    '''
     global state
     state = i.data
 
 def store_valid_cube(i):
+    '''
+    Stores the variable determining if the cube is a valid pickup-position
+    inputs: i (Int), if the current cube is a valid pickup.
+    outputs: N/A
+    '''
     global is_valid_cube
     is_valid_cube = i.data
 
 def calculate_distance(pose):
+    '''
+    Calculate the distance given x and y coordinates
+    Inputs: pose (Pose), the pose for which distance is to be calculated
+    Returns: the distance (float)
+    '''
     desired_x = pose.position.x
     desired_y = pose.position.y  
     return np.sqrt(desired_x**2 + desired_y**2) 
 
 def generate_message(thetalist):
+    '''
+    Returns a message of type JointState given a list of joint angles (list)
+    '''
     msg = JointState(
             header=Header(stamp=rospy.Time.now()),
             name=['joint_1','joint_2', 'joint_3', 'joint_4']
@@ -75,6 +115,15 @@ def generate_message(thetalist):
     return msg
 
 def publish_message(state, message, iterations):
+    '''
+    Publish a JointState message to the relevant topic depending on the \
+        state
+    Inputs: 
+        state (Int) - the current state
+        message (JointState) - the desired joint angles for the given state
+        iterations (Int) - the number of messages to publish
+    Returns: N/A
+    '''
     i=0
     while (i < iterations):
         pub_joint.publish(message)
@@ -96,6 +145,18 @@ def publish_message(state, message, iterations):
 
 def inverse_kinematics(desired_end_angle,pose,desired_z,desired_distance, \
         link_lengths):
+    '''
+    Determine the required joint angles for the given state. Depending on the \
+        state, either uses inverse kinematics or predetermined joint angles to\
+        publish the required joint states
+    Inputs: 
+    - desired_end_angle (Int): The required end effector angle
+    - pose (Pose): The required pose for the end effector
+    - desired_z (Float): The required height of the end effector.
+    - desired_distance (Float): The required distance of the end effector
+    - link_lengths (List): List containing the lengths of the links
+    Returns: (JointState) the required JointState for the arm
+    '''
     desired_x = pose.position.x
     desired_y = pose.position.y
     L1 = link_lengths[0]
@@ -120,8 +181,8 @@ def inverse_kinematics(desired_end_angle,pose,desired_z,desired_distance, \
     
     theta4 =  desired_end_angle - theta2 - theta3
 
-    # CORRECT THETA2 TO THE VERTICAL
-    if theta2 > np.pi/2: # > 90deg
+    # Shift theta2 from the horizontal axis to the vertical axis
+    if theta2 > np.pi/2: 
         theta2 = theta2 - np.pi/2
     elif theta2 < np.pi/2:
         theta2 = np.pi/2 - theta2
@@ -133,35 +194,41 @@ def inverse_kinematics(desired_end_angle,pose,desired_z,desired_distance, \
     return generate_message([theta1,theta2,theta3,theta4])
 
 def joint_angle_publisher(pose):
-    # pose in this case is a  joint states type, not pose type
+    '''
+    Handles publishing of the requireed joint angles to the dynamixel motors
+
+    Inputs: joint_states (JointState): An unused variable used to ensure the \
+        inverse kinematics node operates constantly.
+    Return: N/A
+    '''
     global pub_joint,colour,state,pub_state,desired_position,is_valid_cube, \
         state_7_msg,pub_inter_state
 
     link_lengths = [0.055,0.118,0.094,0.1] #[L1, L2, L3, L4]
     
-    if (state == 0):
+    if (state == 0): # In startup state
         msg = generate_message([0,0,0,0])
         publish_message(0,msg,1)
-    elif (state==-1): # waiting state
+    elif (state==-1): # In reset state. Moves to the previous state's pose
         publish_message(-1,state_7_msg,50)
-    elif (state==1): # intermediate state
+    elif (state==1):  # In waiting state
         thetalist = [0, 0.72, -1.44, 0.112]
         msg = generate_message(thetalist)
         publish_message(1,msg,50)
-    elif (state == 7):        
+    elif (state == 7): # In moving state
         desired_locations_list = desired_locations()
 
         desired_end_angle = desired_locations_list[0]
         desired_z = desired_locations_list[1]
         desired_distance = desired_locations_list[2]
-
+        # Get required JointStates
         state_7_msg = inverse_kinematics(desired_end_angle,desired_position, \
             desired_z, desired_distance,link_lengths)
 
         if is_valid_cube == 1:
             publish_message(7,state_7_msg,30)
-    elif (state == 4): # colour state
-        msg = generate_message([0.03,-0.711,-0.4244,-1.279])
+    elif (state == 4):# Throw the cube
+        msg = generate_message([0,0,0,0])
         publish_message(4,msg,30)
     elif (state == 5):
         thetalist = [0, 0.3, 0.5, 0]
@@ -179,8 +246,14 @@ def joint_angle_publisher(pose):
         publish_message(8,state_8_msg,30)
 
 if __name__ == '__main__':
+    '''
+    The following defines thepublisherss and subscribers for this script
+    Publishers of the format: topic name, type, queue_size
+    Subscribers of the form: topic name, type, callback function
+    '''
     global pub_colour_state,pub_joint,pub_drop_state,pub_grab_state, \
-        pub_wait_state,pub_state,pub_inter_state
+        pub_wait_state,pub_state,pub_inter_state,state
+    state = 0
 
     # Create publisher
     pub_joint = rospy.Publisher('desired_joint_states', JointState, \
