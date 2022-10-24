@@ -203,6 +203,9 @@ def verify(joint_state: JointState): # passes in the desired state
                 pub_state.publish(4)
 
 if __name__ == '__main__':
+    '''
+    
+    '''
     global pub_state,pub_close
     
     is_valid_cube = 1
