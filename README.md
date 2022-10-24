@@ -24,8 +24,9 @@ A controller designed for the 4R robot shown.
   <img src="20221023_151510_1.gif" alt="animated" />
 </p>
 
-The robot has the task of finding, grabbing and shifting aruco tagged cubes using a camera, from a rotating plate to colour designated drop off points.  
+The robot has the task of finding, grabbing and shifting aruco tagged cubes using a camera, from a rotating plate to colour designated drop off points. 
 
+The scripts folder contains all of the python scripts needed to run the project. The src folder is empty but would contain any C++ files needed. The root directory has a CMakeLists.txt C make build file and a package.xml to specify dependencies. 
 
 ## Download
 To download the repo use the following:
